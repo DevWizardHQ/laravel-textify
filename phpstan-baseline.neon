@@ -1,0 +1,32 @@
+parameters:
+	ignoreErrors:
+		# Vonage/Nexmo is an optional dependency
+		-
+			message: "#Property DevWizard\\\\Textify\\\\Providers\\\\Global\\\\NexmoProvider::\\$vonageClient has unknown class Vonage\\\\Client as its type#"
+			count: 1
+			path: src/Providers/Global/NexmoProvider.php
+		-
+			message: "#Instantiated class Vonage\\\\Client\\\\Credentials\\\\Basic not found#"
+			count: 1
+			path: src/Providers/Global/NexmoProvider.php
+		-
+			message: "#Instantiated class Vonage\\\\SMS\\\\Message\\\\SMS not found#"
+			count: 1
+			path: src/Providers/Global/NexmoProvider.php
+		-
+			message: "#Call to method setClientRef\\(\\) on an unknown class Vonage\\\\SMS\\\\Message\\\\SMS#"
+			count: 1
+			path: src/Providers/Global/NexmoProvider.php
+		-
+			message: "#Call to method sms\\(\\) on an unknown class Vonage\\\\Client#"
+			count: 1
+			path: src/Providers/Global/NexmoProvider.php
+		-
+			message: "#Call to method account\\(\\) on an unknown class Vonage\\\\Client#"
+			count: 1
+			path: src/Providers/Global/NexmoProvider.php
+		# env() calls in config files are fine
+		-
+			message: "#Called 'env' outside of the config directory which returns null when the config is cached, use 'config'#"
+			count: 63
+			path: config/textify.php
