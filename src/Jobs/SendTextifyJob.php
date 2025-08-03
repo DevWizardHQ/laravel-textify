@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DevWizard\Textify\Jobs;
 
 use DevWizard\Textify\DTOs\TextifyMessage;
+use DevWizard\Textify\Events\TextifyJobFailed;
 use DevWizard\Textify\Facades\Textify;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -50,6 +51,6 @@ class SendTextifyJob implements ShouldQueue
         ]);
 
         // Optionally dispatch a failed event
-        // event(new TextifyJobFailed($this->message, $this->provider, $exception));
+        event(new TextifyJobFailed($this->message, $this->provider, $exception));
     }
 }

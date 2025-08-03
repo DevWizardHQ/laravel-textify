@@ -5,43 +5,29 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.0.0 - 2025-08-03
+## [1.0.1] - 2025-08-03
 
-### Initial Release 🎉
+### 🐛 Bug Fixes
 
-First stable release of Laravel Textify - Enterprise SMS Package for Laravel
+-   **Fixed Critical Queue Bug**: Fixed `queue()` method incorrectly handling multiple contacts by only processing the first contact (`[0]`)
+-   **Improved Queue Functionality**: Now properly handles arrays of contacts, creating separate jobs for each recipient
+-   **Fixed CI Compatibility**: Removed `describe()` blocks from tests for better CI environment compatibility
 
-✨ Key Features:
-• 8+ SMS Providers Support with unified API
-• Automatic Fallback System for maximum reliability
-• Queue Integration for background processing
-• Comprehensive Activity Tracking & Logging
-• Event-Driven Architecture with lifecycle events
-• Fluent API Interface for developer experience
-• Phone Number Validation & Formatting
-• Laravel 10+ & PHP 8.3+ Support
+### ✨ New Features
 
-📱 Supported Providers:
-🇧🇩 Bangladeshi: DhorolaSMS, BulkSMSBD, MimSMS, eSMS, REVE SMS, Alpha SMS
-🌍 International: Twilio, Nexmo/Vonage (with optional SDK)
-🛠️ Development: Log & Array providers for testing
+-   **Added TextifyJobFailed Event**: New event dispatched when queued SMS jobs fail, providing better error tracking
+-   **Enhanced Queue Error Handling**: Improved error logging and event dispatching for failed queue jobs
 
-🏗️ Enterprise Architecture:
-• Interface-driven design with comprehensive contracts
-• BaseProvider abstraction for easy extension
-• Factory patterns for component creation
-• Laravel service provider with auto-discovery
-• Comprehensive test coverage (39 tests, 211 assertions)
+### 🔧 Configuration Cleanup
 
-📚 Production Ready:
-• Complete documentation with examples
-• Configuration guides for all providers
-• Enterprise-grade error handling
-• Optimized for performance and scalability
+-   **Removed Unused Config**: Cleaned up configuration file by removing unused sections (`queue`, `validation`, `rate_limiting`)
+-   **Updated Activity Tracking Default**: Changed `TEXTIFY_ACTIVITY_TRACKING_ENABLED` default to `false` for opt-in behavior
+-   **Streamlined Config**: Configuration now only includes implemented features for better clarity
 
-Perfect for businesses needing reliable SMS functionality with multiple provider support."
+### 📚 Documentation Updates
 
-**Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/commits/v1.0.0
+-   **Updated README**: Fixed activity tracking default value documentation
+-   **Enhanced Event Documentation**: Added documentation for new `TextifyJobFailed` event
 
 ## [1.0.0] - 2025-08-03
 

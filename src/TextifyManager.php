@@ -270,19 +270,58 @@ class TextifyManager implements TextifyManagerInterface
             throw new TextifyException('No message prepared for queue. Use message() method first.');
         }
 
-        $textifyMessage = TextifyMessage::create(
-            is_array($this->preparedContacts) ? $this->preparedContacts[0] : $this->preparedContacts,
-            $this->preparedMessage,
-            $this->preparedFrom
-        );
+        // Handle single contact (string)
+        if (is_string($this->preparedContacts)) {
+            $textifyMessage = TextifyMessage::create(
+                $this->preparedContacts,
+                $this->preparedMessage,
+                $this->preparedFrom
+            );
 
-        $job = new SendTextifyJob($textifyMessage, $this->defaultProvider ?: 'default');
+            $job = new SendTextifyJob($textifyMessage, $this->defaultProvider ?: 'default');
 
-        if ($queueName) {
-            return dispatch($job)->onQueue($queueName);
+            if ($queueName) {
+                return dispatch($job)->onQueue($queueName);
+            }
+
+            return dispatch($job);
         }
 
-        return dispatch($job);
+        // Handle array of contacts - create multiple jobs
+        $jobs = [];
+
+        // Case 1: Structured array with 'to' and 'message' keys
+        if ($this->isStructuredArray($this->preparedContacts)) {
+            foreach ($this->preparedContacts as $messageData) {
+                $textifyMessage = TextifyMessage::create(
+                    $messageData['to'],
+                    $messageData['message'],
+                    $messageData['from'] ?? $this->preparedFrom,
+                    $messageData['metadata'] ?? []
+                );
+
+                $job = new SendTextifyJob($textifyMessage, $this->defaultProvider ?: 'default');
+
+                $dispatchedJob = $queueName ? dispatch($job)->onQueue($queueName) : dispatch($job);
+                $jobs[] = $dispatchedJob;
+            }
+        } else {
+            // Case 2: Simple array of phone numbers with same message
+            foreach ($this->preparedContacts as $phoneNumber) {
+                $textifyMessage = TextifyMessage::create(
+                    $phoneNumber,
+                    $this->preparedMessage,
+                    $this->preparedFrom
+                );
+
+                $job = new SendTextifyJob($textifyMessage, $this->defaultProvider ?: 'default');
+
+                $dispatchedJob = $queueName ? dispatch($job)->onQueue($queueName) : dispatch($job);
+                $jobs[] = $dispatchedJob;
+            }
+        }
+
+        return $jobs;
     }
 
     /**

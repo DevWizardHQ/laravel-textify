@@ -147,21 +147,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Queue Settings
-    |--------------------------------------------------------------------------
-    |
-    | Configure queue settings for SMS sending
-    |
-    */
-
-    'queue' => [
-        'enabled' => env('TEXTIFY_QUEUE_ENABLED', false),
-        'connection' => env('TEXTIFY_QUEUE_CONNECTION'),
-        'queue' => env('TEXTIFY_QUEUE_NAME', 'sms'),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | SMS Activity Tracking
     |--------------------------------------------------------------------------
     |
@@ -169,7 +154,7 @@ return [
     | This is separate from logging which is used for debugging.
     |
     | Supported trackers: "database", "file", "null"
-    | - database: Store activities in textify_sms_logs table (recommended for production)
+    | - database: Store activities in textify_activities table (recommended for production)
     | - file: Store activities in JSON format in storage/logs/textify-activities.log
     | - null: Disable activity tracking
     |
@@ -192,7 +177,7 @@ return [
 
     'logging' => [
         'enabled' => env('TEXTIFY_LOGGING_ENABLED', true),
-        'log_successful' => env('TEXTIFY_LOG_SUCCESSFUL', true),
+        'log_successful' => env('TEXTIFY_LOG_SUCCESSFUL', false),
         'log_failed' => env('TEXTIFY_LOG_FAILED', true),
         'log_channel' => env('TEXTIFY_LOG_CHANNEL', 'stack'),
     ],
@@ -202,40 +187,11 @@ return [
     | Events
     |--------------------------------------------------------------------------
     |
-    | Configure event dispatching for SMS lifecycle
+    | Configure event dispatching for SMS lifecycle events
     |
     */
 
     'events' => [
         'enabled' => env('TEXTIFY_EVENTS_ENABLED', true),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Validation
-    |--------------------------------------------------------------------------
-    |
-    | Configure phone number validation settings
-    |
-    */
-
-    'validation' => [
-        'enabled' => env('TEXTIFY_VALIDATION_ENABLED', true),
-        'strict_mode' => env('TEXTIFY_STRICT_VALIDATION', false),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Rate Limiting
-    |--------------------------------------------------------------------------
-    |
-    | Configure rate limiting for SMS sending
-    |
-    */
-
-    'rate_limiting' => [
-        'enabled' => env('TEXTIFY_RATE_LIMITING_ENABLED', false),
-        'max_attempts' => env('TEXTIFY_RATE_LIMIT_ATTEMPTS', 60),
-        'decay_minutes' => env('TEXTIFY_RATE_LIMIT_DECAY', 1),
     ],
 ];

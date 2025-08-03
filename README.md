@@ -286,6 +286,7 @@ Textify::to('01712345678')
 ```php
 use DevWizard\Textify\Events\TextifySent;
 use DevWizard\Textify\Events\TextifyFailed;
+use DevWizard\Textify\Events\TextifyJobFailed;
 use Illuminate\Support\Facades\Event;
 
 // Listen for SMS events
@@ -301,6 +302,18 @@ Event::listen(TextifyFailed::class, function (TextifyFailed $event) {
         'to' => $event->message->getTo(),
         'error' => $event->exception?->getMessage() ?? $event->response->getErrorMessage(),
     ]);
+});
+
+// Listen for queued job failures
+Event::listen(TextifyJobFailed::class, function (TextifyJobFailed $event) {
+    logger('SMS job failed', [
+        'to' => $event->getRecipient(),
+        'provider' => $event->getProvider(),
+        'error' => $event->getErrorMessage(),
+        'metadata' => $event->getMetadata(),
+    ]);
+
+    // You could implement retry logic, alerting, etc.
 });
 ```
 
@@ -633,7 +646,7 @@ $todaySms = TextifyActivity::whereDate('created_at', today())->get();
 Listen to SMS lifecycle events:
 
 ```php
-use DevWizard\Textify\Events\{TextifySending, TextifySent, TextifyFailed};
+use DevWizard\Textify\Events\{TextifySending, TextifySent, TextifyFailed, TextifyJobFailed};
 
 // In your EventServiceProvider
 protected $listen = [
@@ -646,9 +659,12 @@ protected $listen = [
     TextifyFailed::class => [
         SmsFailureListener::class,
     ],
+    TextifyJobFailed::class => [
+        QueueJobFailureListener::class,
+    ],
 ];
 
-// Example listener
+// Example listeners
 class SmsSuccessListener
 {
     public function handle(TextifySent $event)
@@ -665,6 +681,26 @@ class SmsSuccessListener
         // Send webhook to external service
         // Update analytics dashboard
     }
+}
+
+class QueueJobFailureListener
+{
+    public function handle(TextifyJobFailed $event)
+    {
+        // Log job failure with detailed metadata
+        logger('SMS queue job failed', $event->getMetadata());
+
+        // Implement retry logic
+        if ($this->shouldRetry($event)) {
+            // Retry with different provider or after delay
+            dispatch(new SendTextifyJob($event->getMessage(), 'fallback-provider'))
+                ->delay(now()->addMinutes(5));
+        }
+
+        // Send alert to administrators
+        // Update monitoring dashboard
+    }
+}
 }
 ```
 
