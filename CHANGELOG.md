@@ -5,29 +5,55 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## V1.0.1 - 2025-08-03
+
+### 🐛 Bug Fixes
+
+- **Fixed Critical Queue Bug**: Fixed `queue()` method incorrectly handling multiple contacts by only processing the first contact (`[0]`)
+- **Improved Queue Functionality**: Now properly handles arrays of contacts, creating separate jobs for each recipient
+- **Fixed CI Compatibility**: Removed `describe()` blocks from tests for better CI environment compatibility
+
+### ✨ New Features
+
+- **Added TextifyJobFailed Event**: New event dispatched when queued SMS jobs fail, providing better error tracking
+- **Enhanced Queue Error Handling**: Improved error logging and event dispatching for failed queue jobs
+
+### 🔧 Configuration Cleanup
+
+- **Removed Unused Config**: Cleaned up configuration file by removing unused sections (`queue`, `validation`, `rate_limiting`)
+- **Updated Activity Tracking Default**: Changed `TEXTIFY_ACTIVITY_TRACKING_ENABLED` default to `false` for opt-in behavior
+- **Streamlined Config**: Configuration now only includes implemented features for better clarity
+
+### 📚 Documentation Updates
+
+- **Updated README**: Fixed activity tracking default value documentation
+- **Enhanced Event Documentation**: Added documentation for new `TextifyJobFailed` event
+
+**Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/compare/v1.0.0...v1.0.1
+
 ## [1.0.1] - 2025-08-03
 
 ### 🐛 Bug Fixes
 
--   **Fixed Critical Queue Bug**: Fixed `queue()` method incorrectly handling multiple contacts by only processing the first contact (`[0]`)
--   **Improved Queue Functionality**: Now properly handles arrays of contacts, creating separate jobs for each recipient
--   **Fixed CI Compatibility**: Removed `describe()` blocks from tests for better CI environment compatibility
+- **Fixed Critical Queue Bug**: Fixed `queue()` method incorrectly handling multiple contacts by only processing the first contact (`[0]`)
+- **Improved Queue Functionality**: Now properly handles arrays of contacts, creating separate jobs for each recipient
+- **Fixed CI Compatibility**: Removed `describe()` blocks from tests for better CI environment compatibility
 
 ### ✨ New Features
 
--   **Added TextifyJobFailed Event**: New event dispatched when queued SMS jobs fail, providing better error tracking
--   **Enhanced Queue Error Handling**: Improved error logging and event dispatching for failed queue jobs
+- **Added TextifyJobFailed Event**: New event dispatched when queued SMS jobs fail, providing better error tracking
+- **Enhanced Queue Error Handling**: Improved error logging and event dispatching for failed queue jobs
 
 ### 🔧 Configuration Cleanup
 
--   **Removed Unused Config**: Cleaned up configuration file by removing unused sections (`queue`, `validation`, `rate_limiting`)
--   **Updated Activity Tracking Default**: Changed `TEXTIFY_ACTIVITY_TRACKING_ENABLED` default to `false` for opt-in behavior
--   **Streamlined Config**: Configuration now only includes implemented features for better clarity
+- **Removed Unused Config**: Cleaned up configuration file by removing unused sections (`queue`, `validation`, `rate_limiting`)
+- **Updated Activity Tracking Default**: Changed `TEXTIFY_ACTIVITY_TRACKING_ENABLED` default to `false` for opt-in behavior
+- **Streamlined Config**: Configuration now only includes implemented features for better clarity
 
 ### 📚 Documentation Updates
 
--   **Updated README**: Fixed activity tracking default value documentation
--   **Enhanced Event Documentation**: Added documentation for new `TextifyJobFailed` event
+- **Updated README**: Fixed activity tracking default value documentation
+- **Enhanced Event Documentation**: Added documentation for new `TextifyJobFailed` event
 
 ## [1.0.0] - 2025-08-03
 
@@ -85,12 +111,16 @@ Laravel Textify v1.0.0 is a comprehensive, enterprise-ready SMS package for Lara
 #### Laravel Integration
 
 - **Service Provider**: `TextifyServiceProvider` with automatic discovery
+  
 - **Facade**: `Textify` facade for easy access
+  
 - **Artisan Commands**:
-    - `textify:table` - Publish database migration for activity tracking
-    - `textify:test` - Test SMS configuration and provider connectivity
-    
+  
+  - `textify:table` - Publish database migration for activity tracking
+  - `textify:test` - Test SMS configuration and provider connectivity
+  
 - **Configuration Publishing**: Customizable config via `vendor:publish`
+  
 
 #### Provider Architecture
 
