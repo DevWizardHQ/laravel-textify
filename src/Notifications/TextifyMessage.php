@@ -26,46 +26,59 @@ class TextifyMessage
      * @param  string|null  $from  The sender ID (optional)
      * @param  string|null  $driver  The SMS provider to use (optional)
      * @param  array  $metadata  Additional metadata (optional)
+     * @return self
      */
     public static function create(
         string $message,
         ?string $from = null,
         ?string $driver = null,
         array $metadata = []
-    ): static {
-        return new static($message, $from, $driver, $metadata);
+    ): self {
+        return new self($message, $from, $driver, $metadata);
     }
 
     /**
      * Set the SMS message content
+     *
+     * @param  string  $message
+     * @return self
      */
-    public function message(string $message): static
+    public function message(string $message): self
     {
-        return new static($message, $this->from, $this->driver, $this->metadata);
+        return new self($message, $this->from, $this->driver, $this->metadata);
     }
 
     /**
      * Set the sender ID
+     *
+     * @param  string  $from
+     * @return self
      */
-    public function from(string $from): static
+    public function from(string $from): self
     {
-        return new static($this->message, $from, $this->driver, $this->metadata);
+        return new self($this->message, $from, $this->driver, $this->metadata);
     }
 
     /**
      * Set the SMS provider/driver
+     *
+     * @param  string  $driver
+     * @return self
      */
-    public function driver(string $driver): static
+    public function driver(string $driver): self
     {
-        return new static($this->message, $this->from, $driver, $this->metadata);
+        return new self($this->message, $this->from, $driver, $this->metadata);
     }
 
     /**
      * Set metadata
+     *
+     * @param  array  $metadata
+     * @return self
      */
-    public function metadata(array $metadata): static
+    public function metadata(array $metadata): self
     {
-        return new static($this->message, $this->from, $this->driver, $metadata);
+        return new self($this->message, $this->from, $this->driver, $metadata);
     }
 
     /**

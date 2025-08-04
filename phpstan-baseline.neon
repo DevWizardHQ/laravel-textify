@@ -25,8 +25,3 @@ parameters:
 			message: "#Call to method account\\(\\) on an unknown class Vonage\\\\Client#"
 			count: 1
 			path: src/Providers/Global/NexmoProvider.php
-		# env() calls in config files are fine
-		-
-			message: "#Called 'env' outside of the config directory which returns null when the config is cached, use 'config'#"
-			count: 63
-			path: config/textify.php
