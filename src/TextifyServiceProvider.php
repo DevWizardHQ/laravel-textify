@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DevWizard\Textify;
 
+use DevWizard\Textify\Channels\TextifyChannel;
 use DevWizard\Textify\Commands\PublishTableCommand;
 use DevWizard\Textify\Commands\TextifyCommand;
 use DevWizard\Textify\Contracts\TextifyManagerInterface;
@@ -20,6 +21,8 @@ use DevWizard\Textify\Providers\Global\NexmoProvider;
 use DevWizard\Textify\Providers\Global\TwilioPlaceholderProvider;
 use DevWizard\Textify\Providers\Global\TwilioProvider;
 use DevWizard\Textify\Providers\LogProvider;
+use Illuminate\Notifications\ChannelManager;
+use Illuminate\Support\Facades\Notification;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -56,6 +59,7 @@ class TextifyServiceProvider extends PackageServiceProvider
     public function packageBooted(): void
     {
         $this->registerProviderFactories();
+        $this->registerNotificationChannel();
     }
 
     protected function registerProviderFactories(): void
@@ -75,6 +79,18 @@ class TextifyServiceProvider extends PackageServiceProvider
                         $e
                     );
                 }
+            });
+        }
+    }
+
+    /**
+     * Register the Textify notification channel
+     */
+    protected function registerNotificationChannel(): void
+    {
+        if (class_exists(ChannelManager::class)) {
+            Notification::extend('textify', function ($app) {
+                return new TextifyChannel($app[TextifyManagerInterface::class]);
             });
         }
     }

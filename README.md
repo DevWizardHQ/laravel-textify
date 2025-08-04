@@ -18,6 +18,7 @@ A powerful and enterprise-ready SMS package for Laravel applications supporting 
 -   🔄 **Automatic Fallback System**: Seamless failover between providers for maximum reliability
 -   📊 **Comprehensive Activity Tracking**: Database and file-based logging with audit trails
 -   ⚡ **Laravel Queue Integration**: Background SMS processing for improved performance
+-   🔔 **Laravel Notifications**: Native notification channel support with `toTextify()` method
 -   🎯 **Fluent API**: Intuitive and chainable methods for developer-friendly experience
 -   📱 **Smart Phone Number Validation**: Automatic formatting and validation for multiple countries
 -   🎨 **Event-Driven Architecture**: Listen to SMS lifecycle events (sending, sent, failed)
@@ -25,7 +26,20 @@ A powerful and enterprise-ready SMS package for Laravel applications supporting 
 -   🛡️ **Production Ready**: Built with enterprise-grade error handling and logging
 -   🔧 **Extensible**: Easy custom provider integration
 
-## 📡 Supported SMS Providers
+## � Table of Contents
+
+-   [📡 Supported SMS Providers](#-supported-sms-providers)
+-   [📦 Installation](#-installation)
+-   [Configuration](#configuration)
+-   [🚀 Quick Start](#-quick-start)
+-   [🔔 Laravel Notifications](#-laravel-notifications)
+-   [📋 Provider-Specific Usage](#-provider-specific-usage)
+-   [📚 API Reference](#-api-reference)
+-   [🔧 Advanced Usage](#-advanced-usage)
+-   [Testing](#testing)
+-   [Contributing](#contributing)
+
+## �📡 Supported SMS Providers
 
 ### 🇧🇩 Bangladeshi Providers
 
@@ -89,6 +103,100 @@ php artisan migrate
 -   **Laravel**: 10.0, 11.0, or 12.0
 -   **Extensions**: cURL, JSON
 
+## Configuration
+
+### Environment Variables
+
+Add these to your `.env` file based on the providers you want to use:
+
+```env
+# Primary Provider Selection
+TEXTIFY_PROVIDER=mimsms
+TEXTIFY_FALLBACK_PROVIDER=revesms
+
+# ===== BANGLADESHI PROVIDERS =====
+
+# DhorolaSMS Configuration
+DHOROLA_API_KEY=your_api_key
+DHOROLA_SENDER_ID=your_sender_id
+DHOROLA_BASE_URI=https://api.dhorolasms.net
+DHOROLA_TIMEOUT=30
+DHOROLA_VERIFY_SSL=true
+
+# BulkSMSBD Configuration
+BULKSMSBD_API_KEY=your_api_key
+BULKSMSBD_SENDER_ID=your_sender_id
+BULKSMSBD_BASE_URI=http://bulksmsbd.net
+BULKSMSBD_TIMEOUT=30
+BULKSMSBD_VERIFY_SSL=false
+
+# MimSMS Configuration
+MIMSMS_USERNAME=your_username
+MIMSMS_APIKEY=your_api_key
+MIMSMS_SENDER_ID=your_sender_id
+MIMSMS_TRANSACTION_TYPE=T
+MIMSMS_CAMPAIGN_ID=your_campaign_id
+MIMSMS_BASE_URI=https://api.mimsms.com
+MIMSMS_TIMEOUT=30
+MIMSMS_VERIFY_SSL=true
+
+# eSMS Configuration
+ESMS_API_TOKEN=your_api_token
+ESMS_SENDER_ID=your_sender_id
+ESMS_BASE_URI=https://login.esms.com.bd
+ESMS_TIMEOUT=30
+ESMS_VERIFY_SSL=true
+
+# REVE SMS Configuration
+REVESMS_APIKEY=your_api_key
+REVESMS_SECRETKEY=your_secret_key
+REVESMS_CLIENT_ID=your_client_id
+REVESMS_SENDER_ID=your_sender_id
+REVESMS_BASE_URI=https://smpp.revesms.com:7790
+REVESMS_BALANCE_URI=https://smpp.revesms.com
+REVESMS_TIMEOUT=30
+REVESMS_VERIFY_SSL=true
+
+# Alpha SMS Configuration
+ALPHASMS_API_KEY=your_api_key
+ALPHASMS_SENDER_ID=your_sender_id
+ALPHASMS_BASE_URI=https://api.sms.net.bd
+ALPHASMS_TIMEOUT=30
+ALPHASMS_VERIFY_SSL=true
+
+# ===== INTERNATIONAL PROVIDERS =====
+
+# Twilio Configuration
+TWILIO_ACCOUNT_SID=your_account_sid
+TWILIO_AUTH_TOKEN=your_auth_token
+TWILIO_FROM=your_phone_number
+
+# Nexmo (Vonage) Configuration
+NEXMO_API_KEY=your_api_key
+NEXMO_API_SECRET=your_api_secret
+NEXMO_FROM=your_sender_id
+NEXMO_CLIENT_REF=your_reference
+NEXMO_TIMEOUT=30
+NEXMO_VERIFY_SSL=true
+
+# ===== PACKAGE CONFIGURATION =====
+
+# Activity Tracking
+TEXTIFY_ACTIVITY_TRACKING_ENABLED=true
+TEXTIFY_ACTIVITY_DRIVER=database
+
+# Logging Configuration
+TEXTIFY_LOGGING_ENABLED=true
+TEXTIFY_LOG_SUCCESSFUL=true
+TEXTIFY_LOG_FAILED=true
+TEXTIFY_LOG_CHANNEL=stack
+
+# Queue Configuration
+TEXTIFY_QUEUE_ENABLED=true
+TEXTIFY_QUEUE_CONNECTION=redis
+TEXTIFY_QUEUE_NAME=sms
+```
+
 ## 🚀 Quick Start
 
 ### Basic SMS Sending
@@ -116,6 +224,251 @@ Textify::to('01712345678')
 Textify::to(['01712345678', '01887654321'])
     ->message('Bulk SMS message')
     ->send();
+```
+
+### Laravel Notifications
+
+```php
+// Create and send SMS notifications
+$user->notify(new OrderShippedNotification('ORD-123'));
+
+// Or send to any phone number
+Notification::route('textify', '01712345678')
+    ->notify(new WelcomeNotification());
+```
+
+## 🔔 Laravel Notifications
+
+Laravel Textify provides seamless integration with Laravel's notification system, allowing you to send SMS notifications just like email or database notifications.
+
+### Quick Setup
+
+1. **Add `textify` to your notification channels:**
+
+```php
+public function via($notifiable): array
+{
+    return ['textify']; // or ['mail', 'textify'] for multiple channels
+}
+```
+
+2. **Implement the `toTextify()` method:**
+
+```php
+public function toTextify($notifiable): TextifyMessage
+{
+    return TextifyMessage::create('Your order has been shipped!');
+}
+```
+
+3. **Configure phone number resolution in your model:**
+
+```php
+public function routeNotificationForTextify($notification): ?string
+{
+    return $this->phone_number;
+}
+```
+
+### Complete Notification Example
+
+```php
+<?php
+
+namespace App\Notifications;
+
+use DevWizard\Textify\Notifications\TextifyMessage;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Notification;
+
+class OrderShippedNotification extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public function __construct(
+        public readonly string $orderNumber,
+        public readonly string $trackingCode
+    ) {}
+
+    /**
+     * Get the notification's delivery channels.
+     */
+    public function via($notifiable): array
+    {
+        return ['textify'];
+    }
+
+    /**
+     * Get the SMS representation of the notification.
+     */
+    public function toTextify($notifiable): TextifyMessage
+    {
+        return TextifyMessage::create(
+            message: "🚚 Order #{$this->orderNumber} shipped! Track: {$this->trackingCode}",
+            from: 'MyStore',
+            driver: 'revesms'
+        );
+    }
+
+    /**
+     * Get the array representation for logging/database
+     */
+    public function toArray($notifiable): array
+    {
+        return [
+            'order_number' => $this->orderNumber,
+            'tracking_code' => $this->trackingCode,
+        ];
+    }
+}
+```
+
+### Phone Number Resolution Methods
+
+The notification channel looks for phone numbers in this priority order:
+
+```php
+class User extends Authenticatable
+{
+    use Notifiable;
+
+    // Method 1: Route method (highest priority)
+    // Gets notification context, most flexible
+    public function routeNotificationForTextify($notification): ?string
+    {
+        // You can use notification context to determine logic
+        if ($notification instanceof UrgentNotification) {
+            return $this->emergency_phone ?? $this->phone_number;
+        }
+
+        return $this->phone_number;
+    }
+
+    // Method 2: Dynamic phone number method
+    // Good for custom business logic
+    public function getTextifyPhoneNumber(): ?string
+    {
+        return $this->preferred_sms_number ?? $this->phone_number ?? $this->mobile;
+    }
+
+    // Method 3: Automatic attribute detection (lowest priority)
+    // Channel automatically checks these attributes:
+    // phone_number, phone, mobile, phn, mobile_number, cell
+}
+```
+
+### Message Format Options
+
+The `toTextify()` method accepts multiple formats:
+
+```php
+// 1. TextifyMessage object (recommended for full control)
+public function toTextify($notifiable): TextifyMessage
+{
+    return TextifyMessage::create(
+        message: 'Your order has shipped!',
+        from: 'MyStore',
+        driver: 'revesms',
+        metadata: ['order_id' => $this->orderId]
+    );
+}
+
+// 2. Simple string (quick and easy)
+public function toTextify($notifiable): string
+{
+    return "Order #{$this->orderNumber} has shipped!";
+}
+
+// 3. Array format (flexible structure)
+public function toTextify($notifiable): array
+{
+    return [
+        'message' => 'Your order has shipped!',
+        'from' => 'MyStore',
+        'driver' => 'revesms',
+    ];
+}
+```
+
+### Sending Notifications
+
+```php
+use App\Notifications\OrderShippedNotification;
+use Illuminate\Support\Facades\Notification;
+
+// Send to a single user
+$user->notify(new OrderShippedNotification('ORD-123', 'TRK-456'));
+
+// Send to multiple users
+$users = User::where('wants_sms', true)->get();
+Notification::send($users, new OrderShippedNotification('ORD-123', 'TRK-456'));
+
+// Send to any phone number without a model
+Notification::route('textify', '01712345678')
+    ->notify(new WelcomeNotification());
+
+// Queue the notification for background processing
+$user->notify(
+    (new OrderShippedNotification('ORD-123', 'TRK-456'))
+        ->delay(now()->addMinutes(5))
+);
+```
+
+### Advanced Features
+
+#### Provider Selection
+
+```php
+public function toTextify($notifiable): TextifyMessage
+{
+    // Use different providers based on user preferences
+    $provider = $notifiable->preferred_sms_provider ?? 'revesms';
+
+    return TextifyMessage::create(
+        message: 'Your notification',
+        driver: $provider
+    );
+}
+```
+
+#### Conditional Sending
+
+```php
+public function via($notifiable): array
+{
+    $channels = ['database']; // Always log to database
+
+    // Add SMS for users who opted in
+    if ($notifiable->sms_notifications_enabled) {
+        $channels[] = 'textify';
+    }
+
+    return $channels;
+}
+```
+
+#### Event Integration
+
+```php
+use DevWizard\Textify\Events\TextifySent;
+use DevWizard\Textify\Events\TextifyFailed;
+
+Event::listen(TextifySent::class, function (TextifySent $event) {
+    // Log successful SMS
+    Log::info('SMS notification sent', [
+        'recipient' => $event->message->getTo(),
+        'message_id' => $event->response->getMessageId(),
+    ]);
+});
+
+Event::listen(TextifyFailed::class, function (TextifyFailed $event) {
+    // Handle SMS failures
+    Log::error('SMS notification failed', [
+        'recipient' => $event->message->getTo(),
+        'error' => $event->response->getErrorMessage(),
+    ]);
+});
 ```
 
 ## 📋 Provider-Specific Usage
@@ -535,6 +888,227 @@ Textify::to('01712345678')->message('Test')->reset(); // Clears prepared data
 
 ## 🔧 Advanced Usage
 
+### Laravel Notifications Integration
+
+> **📖 For comprehensive notification documentation, see the [Laravel Notifications](#-laravel-notifications) section above.**
+
+Laravel Textify provides seamless integration with Laravel's notification system through the `textify` channel.
+
+#### Setting Up Notification Channel
+
+The `textify` notification channel is automatically registered when you install the package. No additional configuration is required.
+
+#### Creating SMS Notifications
+
+Create a notification class that uses the `textify` channel:
+
+```php
+<?php
+
+namespace App\Notifications;
+
+use DevWizard\Textify\Notifications\TextifyMessage;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Notification;
+
+class OrderShippedNotification extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public function __construct(
+        public readonly string $orderNumber,
+        public readonly string $trackingCode
+    ) {}
+
+    /**
+     * Get the notification's delivery channels.
+     */
+    public function via($notifiable): array
+    {
+        return ['textify']; // Add 'textify' to send SMS
+    }
+
+    /**
+     * Get the SMS representation of the notification.
+     */
+    public function toTextify($notifiable): TextifyMessage
+    {
+        return TextifyMessage::create(
+            message: "Your order #{$this->orderNumber} has been shipped! Tracking: {$this->trackingCode}",
+            from: 'MyStore',
+            driver: 'revesms' // Optional: specify SMS provider
+        );
+    }
+}
+```
+
+#### Configuring Notifiable Models
+
+Add SMS routing to your User model (or any notifiable model). You have multiple options:
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use Notifiable;
+
+    // Option 1: Route method (most specific, gets notification context)
+    public function routeNotificationForTextify($notification): ?string
+    {
+        // You can use notification context to determine the phone number
+        return $this->phone_number;
+    }
+
+    // Option 2: Dynamic getTextifyPhoneNumber method (custom logic)
+    public function getTextifyPhoneNumber(): ?string
+    {
+        // Custom logic to determine phone number
+        // Example: Use different numbers based on user preferences
+        return $this->preferred_sms_number ?? $this->phone_number ?? $this->mobile;
+    }
+
+    // Option 3: Automatic attribute detection
+    // If neither method above is defined, the channel will automatically
+    // look for these attributes in this order:
+    // phone_number, phone, phn, mobile, cell, mobile_number
+}
+```
+
+**Priority Order:**
+
+1. `routeNotificationForTextify($notification)` - highest priority
+2. `textifyNumber()` - medium priority
+3. Attribute detection - lowest priority
+
+**Advanced textifyNumber() Examples:**
+
+```php
+class User extends Authenticatable
+{
+    use Notifiable;
+
+    // Example 1: Use different numbers based on notification type
+    public function textifyNumber(): ?string
+    {
+        // Use work phone during business hours, personal phone otherwise
+        $now = now();
+        if ($now->isWeekday() && $now->hour >= 9 && $now->hour <= 17) {
+            return $this->work_phone ?? $this->phone_number;
+        }
+        return $this->personal_phone ?? $this->phone_number;
+    }
+
+    // Example 2: Format phone number dynamically
+    public function textifyNumber(): ?string
+    {
+        $phone = $this->phone_number;
+
+        // Ensure Bangladeshi format
+        if ($phone && !str_starts_with($phone, '880')) {
+            $phone = '880' . ltrim($phone, '0+');
+        }
+
+        return $phone;
+    }
+
+    // Example 3: Use notification preferences
+    public function textifyNumber(): ?string
+    {
+        // Check if user has SMS notifications enabled
+        if (!$this->sms_notifications_enabled) {
+            return null; // Will prevent SMS from being sent
+        }
+
+        return $this->preferred_contact_number ?? $this->phone_number;
+    }
+}
+```
+
+````
+
+#### Sending Notifications
+
+Send SMS notifications like any other Laravel notification:
+
+```php
+use App\Notifications\OrderShippedNotification;
+
+// Send to a single user
+$user->notify(new OrderShippedNotification('ORD-123', 'TRK-456'));
+
+// Send to multiple users
+Notification::send($users, new OrderShippedNotification('ORD-123', 'TRK-456'));
+
+// Queue the notification for background processing
+$user->notify((new OrderShippedNotification('ORD-123', 'TRK-456'))->delay(now()->addMinutes(5)));
+````
+
+#### Notification Message Formats
+
+The `toTextify()` method supports multiple return formats:
+
+```php
+// 1. TextifyMessage object (recommended)
+public function toTextify($notifiable): TextifyMessage
+{
+    return TextifyMessage::create(
+        message: 'Your order has shipped!',
+        from: 'MyStore',
+        driver: 'revesms'
+    );
+}
+
+// 2. Simple string
+public function toTextify($notifiable): string
+{
+    return 'Your order has shipped!';
+}
+
+// 3. Array format
+public function toTextify($notifiable): array
+{
+    return [
+        'message' => 'Your order has shipped!',
+        'from' => 'MyStore',
+        'driver' => 'revesms',
+    ];
+}
+```
+
+#### On-Demand Notifications
+
+Send SMS to any phone number without a model:
+
+```php
+use Illuminate\Support\Facades\Notification;
+
+Notification::route('textify', '01712345678')
+    ->notify(new OrderShippedNotification('ORD-123', 'TRK-456'));
+```
+
+#### Event Integration
+
+SMS notifications integrate with Laravel's event system and Textify's own events:
+
+```php
+use DevWizard\Textify\Events\TextifySent;
+use DevWizard\Textify\Events\TextifyFailed;
+
+Event::listen(TextifySent::class, function (TextifySent $event) {
+    logger('Notification SMS sent', [
+        'recipient' => $event->message->getTo(),
+        'provider' => $event->provider,
+    ]);
+});
+```
+
 ### Custom Providers
 
 Create your own SMS provider by extending the base provider:
@@ -738,100 +1312,6 @@ foreach ($primaryProviders as $provider) {
 ```
 
 When the primary driver fails, the system will automatically try the fallback drivers in order.
-
-## Configuration
-
-### Environment Variables
-
-Add these to your `.env` file based on the providers you want to use:
-
-```env
-# Primary Provider Selection
-TEXTIFY_PROVIDER=mimsms
-TEXTIFY_FALLBACK_PROVIDER=revesms
-
-# ===== BANGLADESHI PROVIDERS =====
-
-# DhorolaSMS Configuration
-DHOROLA_API_KEY=your_api_key
-DHOROLA_SENDER_ID=your_sender_id
-DHOROLA_BASE_URI=https://api.dhorolasms.net
-DHOROLA_TIMEOUT=30
-DHOROLA_VERIFY_SSL=true
-
-# BulkSMSBD Configuration
-BULKSMSBD_API_KEY=your_api_key
-BULKSMSBD_SENDER_ID=your_sender_id
-BULKSMSBD_BASE_URI=http://bulksmsbd.net
-BULKSMSBD_TIMEOUT=30
-BULKSMSBD_VERIFY_SSL=false
-
-# MimSMS Configuration
-MIMSMS_USERNAME=your_username
-MIMSMS_APIKEY=your_api_key
-MIMSMS_SENDER_ID=your_sender_id
-MIMSMS_TRANSACTION_TYPE=T
-MIMSMS_CAMPAIGN_ID=your_campaign_id
-MIMSMS_BASE_URI=https://api.mimsms.com
-MIMSMS_TIMEOUT=30
-MIMSMS_VERIFY_SSL=true
-
-# eSMS Configuration
-ESMS_API_TOKEN=your_api_token
-ESMS_SENDER_ID=your_sender_id
-ESMS_BASE_URI=https://login.esms.com.bd
-ESMS_TIMEOUT=30
-ESMS_VERIFY_SSL=true
-
-# REVE SMS Configuration
-REVESMS_APIKEY=your_api_key
-REVESMS_SECRETKEY=your_secret_key
-REVESMS_CLIENT_ID=your_client_id
-REVESMS_SENDER_ID=your_sender_id
-REVESMS_BASE_URI=https://smpp.revesms.com:7790
-REVESMS_BALANCE_URI=https://smpp.revesms.com
-REVESMS_TIMEOUT=30
-REVESMS_VERIFY_SSL=true
-
-# Alpha SMS Configuration
-ALPHASMS_API_KEY=your_api_key
-ALPHASMS_SENDER_ID=your_sender_id
-ALPHASMS_BASE_URI=https://api.sms.net.bd
-ALPHASMS_TIMEOUT=30
-ALPHASMS_VERIFY_SSL=true
-
-# ===== INTERNATIONAL PROVIDERS =====
-
-# Twilio Configuration
-TWILIO_ACCOUNT_SID=your_account_sid
-TWILIO_AUTH_TOKEN=your_auth_token
-TWILIO_FROM=your_phone_number
-
-# Nexmo (Vonage) Configuration
-NEXMO_API_KEY=your_api_key
-NEXMO_API_SECRET=your_api_secret
-NEXMO_FROM=your_sender_id
-NEXMO_CLIENT_REF=your_reference
-NEXMO_TIMEOUT=30
-NEXMO_VERIFY_SSL=true
-
-# ===== PACKAGE CONFIGURATION =====
-
-# Activity Tracking
-TEXTIFY_ACTIVITY_TRACKING_ENABLED=true
-TEXTIFY_ACTIVITY_DRIVER=database
-
-# Logging Configuration
-TEXTIFY_LOGGING_ENABLED=true
-TEXTIFY_LOG_SUCCESSFUL=true
-TEXTIFY_LOG_FAILED=true
-TEXTIFY_LOG_CHANNEL=stack
-
-# Queue Configuration
-TEXTIFY_QUEUE_ENABLED=true
-TEXTIFY_QUEUE_CONNECTION=redis
-TEXTIFY_QUEUE_NAME=sms
-```
 
 ## Testing
 
