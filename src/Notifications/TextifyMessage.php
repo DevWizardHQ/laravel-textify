@@ -26,7 +26,6 @@ class TextifyMessage
      * @param  string|null  $from  The sender ID (optional)
      * @param  string|null  $driver  The SMS provider to use (optional)
      * @param  array  $metadata  Additional metadata (optional)
-     * @return self
      */
     public static function create(
         string $message,
@@ -39,9 +38,6 @@ class TextifyMessage
 
     /**
      * Set the SMS message content
-     *
-     * @param  string  $message
-     * @return self
      */
     public function message(string $message): self
     {
@@ -50,9 +46,6 @@ class TextifyMessage
 
     /**
      * Set the sender ID
-     *
-     * @param  string  $from
-     * @return self
      */
     public function from(string $from): self
     {
@@ -61,9 +54,6 @@ class TextifyMessage
 
     /**
      * Set the SMS provider/driver
-     *
-     * @param  string  $driver
-     * @return self
      */
     public function driver(string $driver): self
     {
@@ -72,9 +62,6 @@ class TextifyMessage
 
     /**
      * Set metadata
-     *
-     * @param  array  $metadata
-     * @return self
      */
     public function metadata(array $metadata): self
     {
