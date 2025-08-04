@@ -5,6 +5,14 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.1.1 - 2025-08-04
+
+### What we change:
+
+- Refactor TextifyMessage class to use 'self' instead of 'static' for return types and update phpstan baseline configuration
+
+**Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/compare/v1.1.0...v1.1.1
+
 ## v1.1.0 - 2025-08-04
 
 feat: add Laravel notification channel with comprehensive SMS integration
@@ -18,15 +26,21 @@ This commit introduces complete Laravel notification system integration, allowin
 #### 1. TextifyChannel (src/Channels/TextifyChannel.php)
 
 - Full Laravel notification channel implementation
+  
 - Smart phone number resolution with 3-tier priority system:
+  
   1. routeNotificationForTextify() method (notification context aware)
   2. getTextifyPhoneNumber() method (custom business logic)
   3. Automatic attribute detection (phone_number, phone, mobile, phn, cell, mobile_number)
   
 - Support for multiple message formats (TextifyMessage object, string, array)
+  
 - Provider/driver selection per notification
+  
 - Custom sender ID support
+  
 - Comprehensive error handling and validation
+  
 
 #### 2. TextifyMessage DTO (src/Notifications/TextifyMessage.php)
 
