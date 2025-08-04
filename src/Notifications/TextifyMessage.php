@@ -26,7 +26,6 @@ class TextifyMessage
      * @param  string|null  $from  The sender ID (optional)
      * @param  string|null  $driver  The SMS provider to use (optional)
      * @param  array  $metadata  Additional metadata (optional)
-     * @return static
      */
     public static function create(
         string $message,
@@ -39,9 +38,6 @@ class TextifyMessage
 
     /**
      * Set the SMS message content
-     *
-     * @param  string  $message
-     * @return static
      */
     public function message(string $message): static
     {
@@ -50,9 +46,6 @@ class TextifyMessage
 
     /**
      * Set the sender ID
-     *
-     * @param  string  $from
-     * @return static
      */
     public function from(string $from): static
     {
@@ -61,9 +54,6 @@ class TextifyMessage
 
     /**
      * Set the SMS provider/driver
-     *
-     * @param  string  $driver
-     * @return static
      */
     public function driver(string $driver): static
     {
@@ -72,9 +62,6 @@ class TextifyMessage
 
     /**
      * Set metadata
-     *
-     * @param  array  $metadata
-     * @return static
      */
     public function metadata(array $metadata): static
     {
@@ -83,8 +70,6 @@ class TextifyMessage
 
     /**
      * Get the message content
-     *
-     * @return string
      */
     public function getMessage(): string
     {
@@ -93,8 +78,6 @@ class TextifyMessage
 
     /**
      * Get the sender ID
-     *
-     * @return string|null
      */
     public function getFrom(): ?string
     {
@@ -103,8 +86,6 @@ class TextifyMessage
 
     /**
      * Get the driver/provider
-     *
-     * @return string|null
      */
     public function getDriver(): ?string
     {
@@ -113,8 +94,6 @@ class TextifyMessage
 
     /**
      * Get the metadata
-     *
-     * @return array
      */
     public function getMetadata(): array
     {
@@ -123,8 +102,6 @@ class TextifyMessage
 
     /**
      * Convert to array
-     *
-     * @return array
      */
     public function toArray(): array
     {

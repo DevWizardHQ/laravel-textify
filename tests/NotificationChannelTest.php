@@ -21,7 +21,8 @@ beforeEach(function () {
 
 it('can send notifications via textify channel', function () {
     // Create a test notification
-    $notification = new class extends Notification {
+    $notification = new class extends Notification
+    {
         public function via($notifiable): array
         {
             return ['textify'];
@@ -34,7 +35,8 @@ it('can send notifications via textify channel', function () {
     };
 
     // Create a test notifiable
-    $notifiable = new class {
+    $notifiable = new class
+    {
         public function routeNotificationForTextify($notification): string
         {
             return '01712345678';
@@ -53,7 +55,8 @@ it('can send notifications via textify channel', function () {
 
 it('can send notifications with custom driver and sender', function () {
     // Create a test notification with custom driver and sender
-    $notification = new class extends Notification {
+    $notification = new class extends Notification
+    {
         public function via($notifiable): array
         {
             return ['textify'];
@@ -70,7 +73,8 @@ it('can send notifications with custom driver and sender', function () {
     };
 
     // Create a test notifiable
-    $notifiable = new class {
+    $notifiable = new class
+    {
         public function routeNotificationForTextify($notification): string
         {
             return '01812345678';
@@ -90,7 +94,8 @@ it('can send notifications with custom driver and sender', function () {
 
 it('can send notifications with array format', function () {
     // Create a test notification returning array
-    $notification = new class extends Notification {
+    $notification = new class extends Notification
+    {
         public function via($notifiable): array
         {
             return ['textify'];
@@ -106,7 +111,8 @@ it('can send notifications with array format', function () {
     };
 
     // Create a test notifiable
-    $notifiable = new class {
+    $notifiable = new class
+    {
         public function routeNotificationForTextify($notification): string
         {
             return '01912345678';
@@ -126,7 +132,8 @@ it('can send notifications with array format', function () {
 
 it('can send notifications with string format', function () {
     // Create a test notification returning string
-    $notification = new class extends Notification {
+    $notification = new class extends Notification
+    {
         public function via($notifiable): array
         {
             return ['textify'];
@@ -139,7 +146,8 @@ it('can send notifications with string format', function () {
     };
 
     // Create a test notifiable
-    $notifiable = new class {
+    $notifiable = new class
+    {
         public function routeNotificationForTextify($notification): string
         {
             return '01512345678';
@@ -158,7 +166,8 @@ it('can send notifications with string format', function () {
 
 it('throws exception when phone number cannot be determined', function () {
     // Create a test notification
-    $notification = new class extends Notification {
+    $notification = new class extends Notification
+    {
         public function via($notifiable): array
         {
             return ['textify'];
@@ -171,18 +180,20 @@ it('throws exception when phone number cannot be determined', function () {
     };
 
     // Create a test notifiable without phone number
-    $notifiable = new class {
+    $notifiable = new class
+    {
         // No phone number methods or properties
     };
 
     // Send the notification - should throw exception
-    expect(fn() => NotificationFacade::send($notifiable, $notification))
+    expect(fn () => NotificationFacade::send($notifiable, $notification))
         ->toThrow(TextifyException::class, 'Unable to determine phone number for notification');
 });
 
 it('uses getTextifyPhoneNumber method when available', function () {
     // Create a test notification
-    $notification = new class extends Notification {
+    $notification = new class extends Notification
+    {
         public function via($notifiable): array
         {
             return ['textify'];
@@ -195,7 +206,8 @@ it('uses getTextifyPhoneNumber method when available', function () {
     };
 
     // Create a test notifiable with getTextifyPhoneNumber method
-    $notifiable = new class {
+    $notifiable = new class
+    {
         public function getTextifyPhoneNumber(): string
         {
             return '01312345678';
@@ -214,7 +226,8 @@ it('uses getTextifyPhoneNumber method when available', function () {
 
 it('uses phone_number attribute when methods are not available', function () {
     // Create a test notification
-    $notification = new class extends Notification {
+    $notification = new class extends Notification
+    {
         public function via($notifiable): array
         {
             return ['textify'];
@@ -227,7 +240,8 @@ it('uses phone_number attribute when methods are not available', function () {
     };
 
     // Create a test notifiable with phone_number attribute
-    $notifiable = new class {
+    $notifiable = new class
+    {
         public $phone_number = '01612345678';
     };
 
@@ -243,7 +257,8 @@ it('uses phone_number attribute when methods are not available', function () {
 
 it('prioritizes routeNotificationForTextify over getTextifyPhoneNumber', function () {
     // Create a test notification
-    $notification = new class extends Notification {
+    $notification = new class extends Notification
+    {
         public function via($notifiable): array
         {
             return ['textify'];
@@ -256,7 +271,8 @@ it('prioritizes routeNotificationForTextify over getTextifyPhoneNumber', functio
     };
 
     // Create a test notifiable with both methods
-    $notifiable = new class {
+    $notifiable = new class
+    {
         public function routeNotificationForTextify($notification): string
         {
             return '01112345678'; // This should be used
@@ -283,7 +299,8 @@ it('can use textify channel directly', function () {
     $channel = new TextifyChannel($manager);
 
     // Create a test notification
-    $notification = new class extends Notification {
+    $notification = new class extends Notification
+    {
         public function toTextify($notifiable): TextifyMessage
         {
             return TextifyMessage::create('Direct channel test');
@@ -291,7 +308,8 @@ it('can use textify channel directly', function () {
     };
 
     // Create a test notifiable
-    $notifiable = new class {
+    $notifiable = new class
+    {
         public function routeNotificationForTextify($notification): string
         {
             return '01412345678';

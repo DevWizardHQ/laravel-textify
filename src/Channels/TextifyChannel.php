@@ -34,14 +34,13 @@ class TextifyChannel
      *
      * @param  mixed  $notifiable  The notifiable entity (User, etc.)
      * @param  \Illuminate\Notifications\Notification  $notification  The notification instance
-     * @return \DevWizard\Textify\DTOs\TextifyResponse|null
      *
      * @throws \DevWizard\Textify\Exceptions\TextifyException
      */
     public function send($notifiable, Notification $notification): ?TextifyResponse
     {
         // Get the SMS data from the notification first to avoid unnecessary phone number lookup
-        if (!method_exists($notification, 'toTextify')) {
+        if (! method_exists($notification, 'toTextify')) {
             throw new TextifyException(
                 'Notification must implement toTextify() method to use the Textify channel.'
             );
@@ -50,23 +49,23 @@ class TextifyChannel
         /** @var mixed $textifyData */
         $textifyData = $notification->toTextify($notifiable);
 
-        if (!$textifyData) {
+        if (! $textifyData) {
             return null;
         }
 
         // Get the phone number from the notifiable
         $phoneNumber = $this->getPhoneNumber($notifiable, $notification);
 
-        if (!$phoneNumber) {
+        if (! $phoneNumber) {
             throw new TextifyException(
-                'Unable to determine phone number for notification. ' .
+                'Unable to determine phone number for notification. '.
                     'Implement routeNotificationForTextify() or getTextifyPhoneNumber() method, or ensure phone_number attribute exists.'
             );
         }
 
         // Prepare the SMS data
         $message = $this->getMessage($textifyData);
-        if (!$message || trim($message) === '') {
+        if (! $message || trim($message) === '') {
             throw new TextifyException('SMS message is required for Textify notifications.');
         }
 
@@ -94,15 +93,13 @@ class TextifyChannel
      * Get the phone number for the notifiable
      *
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @return string|null
      */
     protected function getPhoneNumber($notifiable, Notification $notification): ?string
     {
         // First try the route notification method (most specific)
         if (method_exists($notifiable, 'routeNotificationForTextify')) {
             $phoneNumber = $notifiable->routeNotificationForTextify($notification);
-            if (!empty($phoneNumber)) {
+            if (! empty($phoneNumber)) {
                 return $phoneNumber;
             }
         }
@@ -110,7 +107,7 @@ class TextifyChannel
         // Then try the custom getTextifyPhoneNumber method
         if (method_exists($notifiable, 'getTextifyPhoneNumber')) {
             $phoneNumber = $notifiable->getTextifyPhoneNumber();
-            if (!empty($phoneNumber)) {
+            if (! empty($phoneNumber)) {
                 return $phoneNumber;
             }
         }
@@ -119,7 +116,7 @@ class TextifyChannel
         $phoneAttributes = ['phone_number', 'phone', 'mobile', 'phn', 'mobile_number', 'cell'];
 
         foreach ($phoneAttributes as $attribute) {
-            if (isset($notifiable->{$attribute}) && !empty($notifiable->{$attribute})) {
+            if (isset($notifiable->{$attribute}) && ! empty($notifiable->{$attribute})) {
                 return $notifiable->{$attribute};
             }
         }
@@ -131,7 +128,6 @@ class TextifyChannel
      * Get the message from the notification data
      *
      * @param  mixed  $textifyData
-     * @return string|null
      */
     protected function getMessage($textifyData): ?string
     {
@@ -158,7 +154,6 @@ class TextifyChannel
      * Get the sender ID from the notification data
      *
      * @param  mixed  $textifyData
-     * @return string|null
      */
     protected function getFrom($textifyData): ?string
     {
@@ -181,7 +176,6 @@ class TextifyChannel
      * Get the SMS driver/provider from the notification data
      *
      * @param  mixed  $textifyData
-     * @return string|null
      */
     protected function getDriver($textifyData): ?string
     {
