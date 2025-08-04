@@ -5,6 +5,72 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.1.0 - 2025-08-04
+
+feat: add Laravel notification channel with comprehensive SMS integration
+
+🔔 MAJOR FEATURE: Laravel Notifications Integration
+
+This commit introduces complete Laravel notification system integration, allowing developers to send SMS notifications using the 'textify' channel alongside mail, database, and other Laravel notification channels.
+
+### New Features Added:
+
+#### 1. TextifyChannel (src/Channels/TextifyChannel.php)
+
+- Full Laravel notification channel implementation
+- Smart phone number resolution with 3-tier priority system:
+  1. routeNotificationForTextify() method (notification context aware)
+  2. getTextifyPhoneNumber() method (custom business logic)
+  3. Automatic attribute detection (phone_number, phone, mobile, phn, cell, mobile_number)
+  
+- Support for multiple message formats (TextifyMessage object, string, array)
+- Provider/driver selection per notification
+- Custom sender ID support
+- Comprehensive error handling and validation
+
+#### 2. TextifyMessage DTO (src/Notifications/TextifyMessage.php)
+
+- Immutable data structure for SMS notifications
+- Fluent API for easy message construction
+- Support for message, sender ID, driver/provider, and metadata
+- Factory method pattern with TextifyMessage::create()
+- Seamless integration with notification channel
+
+#### 3. Service Provider Integration (src/TextifyServiceProvider.php)
+
+- Automatic notification channel registration
+- Integration with Laravel's ChannelManager
+- No additional configuration required - works out of the box
+
+#### 4. Comprehensive Test Suite (tests/NotificationChannelTest.php)
+
+- 9 test cases covering all notification scenarios
+- Phone number resolution priority testing
+- Multiple message format validation
+- Error handling verification
+- Direct channel usage testing
+- Edge case coverage
+
+#### 5. Usage Examples (examples/NotificationExamples.php)
+
+- 5 real-world notification examples
+- Order notifications, OTP, marketing, emergency alerts
+- User model integration examples
+- Advanced notification patterns
+- Best practices and conventions
+
+#### 6. Enhanced Documentation (README.md)
+
+- Complete Laravel Notifications section with table of contents
+- Step-by-step setup guide
+- Phone number resolution methods documentation
+- Message format examples
+- Event integration patterns
+- Advanced usage scenarios
+- Configuration examples
+
+**Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/compare/v1.0.1...v1.1.0
+
 ## V1.0.1 - 2025-08-03
 
 ### 🐛 Bug Fixes
