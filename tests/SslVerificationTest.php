@@ -8,14 +8,18 @@ use DevWizard\Textify\Providers\Bangladeshi\EsmsProvider;
 use DevWizard\Textify\Providers\Bangladeshi\MimSmsProvider;
 use DevWizard\Textify\Providers\Bangladeshi\ReveSmsProvider;
 
+/**
+ * Helper function to get client config using reflection
+ */
+function getClientConfig($provider): array
+{
+    $reflection = new ReflectionClass($provider);
+    $method = $reflection->getMethod('getClientConfig');
+    $method->setAccessible(true);
+    return $method->invoke($provider);
+}
+
 it('defaults SSL verification to false for all providers', function () {
-    // Helper function to get client config using reflection
-    $getClientConfig = function ($provider) {
-        $reflection = new ReflectionClass($provider);
-        $method = $reflection->getMethod('getClientConfig');
-        $method->setAccessible(true);
-        return $method->invoke($provider);
-    };
 
     // Test ReveSmsProvider
     $reveProvider = new ReveSmsProvider([
@@ -23,14 +27,14 @@ it('defaults SSL verification to false for all providers', function () {
         'secretkey' => 'test_secret',
         'client_id' => 'test_client',
     ]);
-    $reveConfig = $getClientConfig($reveProvider);
+    $reveConfig = getClientConfig($reveProvider);
     expect($reveConfig['verify'])->toBeFalse();
 
     // Test AlphaSmsProvider
     $alphaProvider = new AlphaSmsProvider([
         'api_key' => 'test_key',
     ]);
-    $alphaConfig = $getClientConfig($alphaProvider);
+    $alphaConfig = getClientConfig($alphaProvider);
     expect($alphaConfig['verify'])->toBeFalse();
 
     // Test DhorolaSmsProvider
@@ -38,7 +42,7 @@ it('defaults SSL verification to false for all providers', function () {
         'api_key' => 'test_key',
         'sender_id' => 'test_sender',
     ]);
-    $dhorolaConfig = $getClientConfig($dhorolaProvider);
+    $dhorolaConfig = getClientConfig($dhorolaProvider);
     expect($dhorolaConfig['verify'])->toBeFalse();
 
     // Test EsmsProvider
@@ -46,7 +50,7 @@ it('defaults SSL verification to false for all providers', function () {
         'api_token' => 'test_token',
         'sender_id' => 'test_sender',
     ]);
-    $esmsConfig = $getClientConfig($esmsProvider);
+    $esmsConfig = getClientConfig($esmsProvider);
     expect($esmsConfig['verify'])->toBeFalse();
 
     // Test MimSmsProvider
@@ -54,19 +58,11 @@ it('defaults SSL verification to false for all providers', function () {
         'username' => 'test@example.com',
         'apikey' => 'test_key',
     ]);
-    $mimConfig = $getClientConfig($mimProvider);
+    $mimConfig = getClientConfig($mimProvider);
     expect($mimConfig['verify'])->toBeFalse();
 });
 
 it('allows SSL verification to be explicitly enabled', function () {
-    // Helper function to get client config using reflection
-    $getClientConfig = function ($provider) {
-        $reflection = new ReflectionClass($provider);
-        $method = $reflection->getMethod('getClientConfig');
-        $method->setAccessible(true);
-        return $method->invoke($provider);
-    };
-
     // Test that explicit verify_ssl=true works
     $reveProvider = new ReveSmsProvider([
         'apikey' => 'test_key',
@@ -74,7 +70,7 @@ it('allows SSL verification to be explicitly enabled', function () {
         'client_id' => 'test_client',
         'verify_ssl' => true,
     ]);
-    $reveConfig = $getClientConfig($reveProvider);
+    $reveConfig = getClientConfig($reveProvider);
     expect($reveConfig['verify'])->toBeTrue();
 
     // Test that explicit verify_ssl=false works
@@ -82,7 +78,7 @@ it('allows SSL verification to be explicitly enabled', function () {
         'api_key' => 'test_key',
         'verify_ssl' => false,
     ]);
-    $alphaConfig = $getClientConfig($alphaProvider);
+    $alphaConfig = getClientConfig($alphaProvider);
     expect($alphaConfig['verify'])->toBeFalse();
 });
 
