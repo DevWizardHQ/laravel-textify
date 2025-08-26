@@ -20,7 +20,7 @@ class MimSmsProvider extends BaseProvider
         return [
             'base_uri' => $this->config['base_uri'] ?? 'https://api.mimsms.com',
             'timeout' => $this->config['timeout'] ?? 30,
-            'verify' => $this->config['verify_ssl'] ?? true,
+            'verify' => $this->config['verify_ssl'] ?? false,
         ];
     }
 

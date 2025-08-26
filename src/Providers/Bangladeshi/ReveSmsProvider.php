@@ -20,7 +20,7 @@ class ReveSmsProvider extends BaseProvider
         return [
             'base_uri' => $this->config['base_uri'] ?? 'https://smpp.revesms.com:7790',
             'timeout' => $this->config['timeout'] ?? 30,
-            'verify' => $this->config['verify_ssl'] ?? true,
+            'verify' => $this->config['verify_ssl'] ?? false,
         ];
     }
 
@@ -140,7 +140,7 @@ class ReveSmsProvider extends BaseProvider
             $balanceClient = new \GuzzleHttp\Client([
                 'base_uri' => $balanceUri,
                 'timeout' => $this->config['timeout'] ?? 30,
-                'verify' => $this->config['verify_ssl'] ?? true,
+                'verify' => $this->config['verify_ssl'] ?? false,
             ]);
 
             $response = $balanceClient->get('/sms/smsConfiguration/smsClientBalance.jsp', [
