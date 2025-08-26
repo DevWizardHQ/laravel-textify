@@ -20,7 +20,7 @@ class EsmsProvider extends BaseProvider
         return [
             'base_uri' => $this->config['base_uri'] ?? 'https://login.esms.com.bd',
             'timeout' => $this->config['timeout'] ?? 30,
-            'verify' => $this->config['verify_ssl'] ?? true,
+            'verify' => $this->config['verify_ssl'] ?? false,
         ];
     }
 

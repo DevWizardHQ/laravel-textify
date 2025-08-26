@@ -71,7 +71,7 @@ return [
             'sender_id' => env('DHOROLA_SENDER_ID'),
             'base_uri' => env('DHOROLA_BASE_URI', 'https://api.dhorolasms.net'),
             'timeout' => env('DHOROLA_TIMEOUT', 30),
-            'verify_ssl' => env('DHOROLA_VERIFY_SSL', true),
+            'verify_ssl' => env('DHOROLA_VERIFY_SSL', false),
         ],
 
         'bulksmsbd' => [
@@ -92,7 +92,7 @@ return [
             'campaign_id' => env('MIMSMS_CAMPAIGN_ID'),
             'base_uri' => env('MIMSMS_BASE_URI', 'https://api.mimsms.com'),
             'timeout' => env('MIMSMS_TIMEOUT', 30),
-            'verify_ssl' => env('MIMSMS_VERIFY_SSL', true),
+            'verify_ssl' => env('MIMSMS_VERIFY_SSL', false),
         ],
 
         'esms' => [
@@ -101,7 +101,7 @@ return [
             'sender_id' => env('ESMS_SENDER_ID'),
             'base_uri' => env('ESMS_BASE_URI', 'https://login.esms.com.bd'),
             'timeout' => env('ESMS_TIMEOUT', 30),
-            'verify_ssl' => env('ESMS_VERIFY_SSL', true),
+            'verify_ssl' => env('ESMS_VERIFY_SSL', false),
         ],
 
         'revesms' => [
@@ -113,7 +113,7 @@ return [
             'base_uri' => env('REVESMS_BASE_URI', 'https://smpp.revesms.com:7790'),
             'balance_uri' => env('REVESMS_BALANCE_URI', 'https://smpp.revesms.com'),
             'timeout' => env('REVESMS_TIMEOUT', 30),
-            'verify_ssl' => env('REVESMS_VERIFY_SSL', true),
+            'verify_ssl' => env('REVESMS_VERIFY_SSL', false),
         ],
 
         'alphasms' => [
@@ -122,7 +122,7 @@ return [
             'sender_id' => env('ALPHASMS_SENDER_ID'),
             'base_uri' => env('ALPHASMS_BASE_URI', 'https://api.sms.net.bd'),
             'timeout' => env('ALPHASMS_TIMEOUT', 30),
-            'verify_ssl' => env('ALPHASMS_VERIFY_SSL', true),
+            'verify_ssl' => env('ALPHASMS_VERIFY_SSL', false),
         ],
 
         // Global SMS Providers
@@ -141,7 +141,7 @@ return [
             'from' => env('NEXMO_FROM', 'Vonage APIs'),
             'client_ref' => env('NEXMO_CLIENT_REF'), // Optional: Custom reference for tracking
             'timeout' => env('NEXMO_TIMEOUT', 30),
-            'verify_ssl' => env('NEXMO_VERIFY_SSL', true),
+            'verify_ssl' => env('NEXMO_VERIFY_SSL', false),
         ],
     ],
 
