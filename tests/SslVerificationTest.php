@@ -16,6 +16,7 @@ function getClientConfig($provider): array
     $reflection = new ReflectionClass($provider);
     $method = $reflection->getMethod('getClientConfig');
     $method->setAccessible(true);
+
     return $method->invoke($provider);
 }
 
@@ -93,7 +94,7 @@ it('ensures ReveSmsProvider balance client also respects SSL verification settin
 
     // Verify the getBalance method exists
     expect(method_exists($provider, 'getBalance'))->toBeTrue();
-    
+
     // Verify that the provider is properly configured
     expect($provider)->toBeInstanceOf(ReveSmsProvider::class);
 });
