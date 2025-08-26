@@ -5,6 +5,19 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.1.2 - 2025-08-26
+
+### What's Changed
+
+* build(deps): Bump actions/checkout from 4 to 5 by @dependabot[bot] in https://github.com/DevWizardHQ/laravel-textify/pull/2
+* fix: set SSL verification to false by default to prevent connection timeouts (#3) by @iqbalhasandev in https://github.com/DevWizardHQ/laravel-textify/pull/4
+
+### New Contributors
+
+* @iqbalhasandev made their first contribution in https://github.com/DevWizardHQ/laravel-textify/pull/4
+
+**Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/compare/v1.1.1...v1.1.2
+
 ## v1.1.1 - 2025-08-04
 
 ### What we change:
