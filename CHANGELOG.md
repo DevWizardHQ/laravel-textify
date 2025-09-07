@@ -5,6 +5,64 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.2.0 - 2025-09-07
+
+### What's Changed
+
+#### 🚀 New Features
+
+* **feat: add connect_timeout configuration option**
+  - Added `connect_timeout` option to all SMS provider configurations
+  - Updated `BaseProvider` to use `connect_timeout` in HTTP client config
+  - Added comprehensive test coverage for `connect_timeout` functionality
+  - Updated provider configuration documentation
+  - Default `connect_timeout` is 10 seconds, configurable per provider
+  
+
+#### ⚡ Enhanced Provider Configuration
+
+* **Timeout Configuration:** Providers now support two distinct timeout settings:
+  - `timeout`: Maximum time (in seconds) to wait for a response from the API (default: 30s)
+  - `connect_timeout`: Maximum time (in seconds) to wait for connection establishment (default: 10s)
+  
+
+#### 📋 Updated Providers
+
+All SMS providers now support the new `connect_timeout` configuration:
+
+- Dhorola SMS: `DHOROLA_CONNECT_TIMEOUT` (default: 10s)
+- BulkSMSBD: `BULKSMSBD_CONNECT_TIMEOUT` (default: 10s)
+- MimSMS: `MIMSMS_CONNECT_TIMEOUT` (default: 10s)
+- eSMS: `ESMS_CONNECT_TIMEOUT` (default: 10s)
+- REVE SMS: `REVESMS_CONNECT_TIMEOUT` (default: 10s)
+- Alpha SMS: `ALPHASMS_CONNECT_TIMEOUT` (default: 10s)
+- Nexmo: `NEXMO_CONNECT_TIMEOUT` (default: 10s)
+
+#### 🧪 Testing
+
+* Added `ConnectTimeoutTest` with comprehensive test coverage
+* Tests verify proper default values and configuration handling
+* All existing tests continue to pass
+
+### Breaking Changes
+
+None. This is a backward-compatible feature addition.
+
+### Migration Guide
+
+To use the new connect_timeout feature, add the appropriate environment variable to your `.env` file:
+
+```env
+# Example for Dhorola SMS provider
+DHOROLA_CONNECT_TIMEOUT=15
+
+# Or for any other provider
+BULKSMSBD_CONNECT_TIMEOUT=8
+MIMSMS_CONNECT_TIMEOUT=12
+
+```
+**Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/compare/v1.1.2...v1.2.0
+
 ## v1.1.2 - 2025-08-26
 
 ### What's Changed
