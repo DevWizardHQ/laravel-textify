@@ -105,6 +105,15 @@ php artisan migrate
 
 ## Configuration
 
+### Timeout Configuration
+
+Laravel Textify supports two types of timeout configurations for all SMS providers:
+
+- **`timeout`**: Maximum time (in seconds) to wait for a response from the API (default: 30s)
+- **`connect_timeout`**: Maximum time (in seconds) to wait for connection establishment (default: 10s)
+
+These settings help ensure reliable SMS delivery by preventing indefinite waits when providers are slow or unreachable.
+
 ### Environment Variables
 
 Add these to your `.env` file based on the providers you want to use:
@@ -121,6 +130,7 @@ DHOROLA_API_KEY=your_api_key
 DHOROLA_SENDER_ID=your_sender_id
 DHOROLA_BASE_URI=https://api.dhorolasms.net
 DHOROLA_TIMEOUT=30
+DHOROLA_CONNECT_TIMEOUT=10
 DHOROLA_VERIFY_SSL=true
 
 # BulkSMSBD Configuration
@@ -128,6 +138,7 @@ BULKSMSBD_API_KEY=your_api_key
 BULKSMSBD_SENDER_ID=your_sender_id
 BULKSMSBD_BASE_URI=http://bulksmsbd.net
 BULKSMSBD_TIMEOUT=30
+BULKSMSBD_CONNECT_TIMEOUT=10
 BULKSMSBD_VERIFY_SSL=false
 
 # MimSMS Configuration
@@ -138,6 +149,7 @@ MIMSMS_TRANSACTION_TYPE=T
 MIMSMS_CAMPAIGN_ID=your_campaign_id
 MIMSMS_BASE_URI=https://api.mimsms.com
 MIMSMS_TIMEOUT=30
+MIMSMS_CONNECT_TIMEOUT=10
 MIMSMS_VERIFY_SSL=true
 
 # eSMS Configuration
@@ -145,6 +157,7 @@ ESMS_API_TOKEN=your_api_token
 ESMS_SENDER_ID=your_sender_id
 ESMS_BASE_URI=https://login.esms.com.bd
 ESMS_TIMEOUT=30
+ESMS_CONNECT_TIMEOUT=10
 ESMS_VERIFY_SSL=true
 
 # REVE SMS Configuration
@@ -155,6 +168,7 @@ REVESMS_SENDER_ID=your_sender_id
 REVESMS_BASE_URI=https://smpp.revesms.com:7790
 REVESMS_BALANCE_URI=https://smpp.revesms.com
 REVESMS_TIMEOUT=30
+REVESMS_CONNECT_TIMEOUT=10
 REVESMS_VERIFY_SSL=true
 
 # Alpha SMS Configuration
@@ -162,6 +176,7 @@ ALPHASMS_API_KEY=your_api_key
 ALPHASMS_SENDER_ID=your_sender_id
 ALPHASMS_BASE_URI=https://api.sms.net.bd
 ALPHASMS_TIMEOUT=30
+ALPHASMS_CONNECT_TIMEOUT=10
 ALPHASMS_VERIFY_SSL=true
 
 # ===== INTERNATIONAL PROVIDERS =====
@@ -177,6 +192,7 @@ NEXMO_API_SECRET=your_api_secret
 NEXMO_FROM=your_sender_id
 NEXMO_CLIENT_REF=your_reference
 NEXMO_TIMEOUT=30
+NEXMO_CONNECT_TIMEOUT=10
 NEXMO_VERIFY_SSL=true
 
 # ===== PACKAGE CONFIGURATION =====
