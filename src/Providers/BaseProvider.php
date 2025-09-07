@@ -98,6 +98,7 @@ abstract class BaseProvider implements TextifyProviderInterface
     {
         return [
             'timeout' => $this->config['timeout'] ?? 30,
+            'connect_timeout' => $this->config['connect_timeout'] ?? 10,
             'verify' => $this->config['verify_ssl'] ?? false,
         ];
     }
