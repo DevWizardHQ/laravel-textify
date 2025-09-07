@@ -40,6 +40,10 @@ return [
     | plus their respective settings. Several examples have been configured
     | for you and you are free to add your own as needed.
     |
+    | Timeout Configuration:
+    | - timeout: Maximum time (in seconds) to wait for a response from the API
+    | - connect_timeout: Maximum time (in seconds) to wait for connection establishment
+    |
     | To add a custom provider, create a class extending TextifyProvider and
     | add it to this array:
     |
@@ -48,6 +52,8 @@ return [
     |     'class' => App\Services\MySmsProvider::class,
     |     'api_key' => env('MY_CUSTOM_API_KEY'),
     |     'api_secret' => env('MY_CUSTOM_API_SECRET'),
+    |     'timeout' => env('MY_CUSTOM_TIMEOUT', 30),
+    |     'connect_timeout' => env('MY_CUSTOM_CONNECT_TIMEOUT', 10),
     |     // other configuration...
     | ],
     |
@@ -71,6 +77,7 @@ return [
             'sender_id' => env('DHOROLA_SENDER_ID'),
             'base_uri' => env('DHOROLA_BASE_URI', 'https://api.dhorolasms.net'),
             'timeout' => env('DHOROLA_TIMEOUT', 30),
+            'connect_timeout' => env('DHOROLA_CONNECT_TIMEOUT', 10),
             'verify_ssl' => env('DHOROLA_VERIFY_SSL', false),
         ],
 
@@ -80,6 +87,7 @@ return [
             'sender_id' => env('BULKSMSBD_SENDER_ID'),
             'base_uri' => env('BULKSMSBD_BASE_URI', 'http://bulksmsbd.net'),
             'timeout' => env('BULKSMSBD_TIMEOUT', 30),
+            'connect_timeout' => env('BULKSMSBD_CONNECT_TIMEOUT', 10),
             'verify_ssl' => env('BULKSMSBD_VERIFY_SSL', false),
         ],
 
@@ -92,6 +100,7 @@ return [
             'campaign_id' => env('MIMSMS_CAMPAIGN_ID'),
             'base_uri' => env('MIMSMS_BASE_URI', 'https://api.mimsms.com'),
             'timeout' => env('MIMSMS_TIMEOUT', 30),
+            'connect_timeout' => env('MIMSMS_CONNECT_TIMEOUT', 10),
             'verify_ssl' => env('MIMSMS_VERIFY_SSL', false),
         ],
 
@@ -101,6 +110,7 @@ return [
             'sender_id' => env('ESMS_SENDER_ID'),
             'base_uri' => env('ESMS_BASE_URI', 'https://login.esms.com.bd'),
             'timeout' => env('ESMS_TIMEOUT', 30),
+            'connect_timeout' => env('ESMS_CONNECT_TIMEOUT', 10),
             'verify_ssl' => env('ESMS_VERIFY_SSL', false),
         ],
 
@@ -113,6 +123,7 @@ return [
             'base_uri' => env('REVESMS_BASE_URI', 'https://smpp.revesms.com:7790'),
             'balance_uri' => env('REVESMS_BALANCE_URI', 'https://smpp.revesms.com'),
             'timeout' => env('REVESMS_TIMEOUT', 30),
+            'connect_timeout' => env('REVESMS_CONNECT_TIMEOUT', 10),
             'verify_ssl' => env('REVESMS_VERIFY_SSL', false),
         ],
 
@@ -122,6 +133,7 @@ return [
             'sender_id' => env('ALPHASMS_SENDER_ID'),
             'base_uri' => env('ALPHASMS_BASE_URI', 'https://api.sms.net.bd'),
             'timeout' => env('ALPHASMS_TIMEOUT', 30),
+            'connect_timeout' => env('ALPHASMS_CONNECT_TIMEOUT', 10),
             'verify_ssl' => env('ALPHASMS_VERIFY_SSL', false),
         ],
 
@@ -141,6 +153,7 @@ return [
             'from' => env('NEXMO_FROM', 'Vonage APIs'),
             'client_ref' => env('NEXMO_CLIENT_REF'), // Optional: Custom reference for tracking
             'timeout' => env('NEXMO_TIMEOUT', 30),
+            'connect_timeout' => env('NEXMO_CONNECT_TIMEOUT', 10),
             'verify_ssl' => env('NEXMO_VERIFY_SSL', false),
         ],
     ],
