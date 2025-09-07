@@ -3,9 +3,8 @@
 declare(strict_types=1);
 
 use DevWizard\Textify\DTOs\TextifyMessage;
-use DevWizard\Textify\Providers\BaseProvider;
 use DevWizard\Textify\DTOs\TextifyResponse;
-use GuzzleHttp\Client;
+use DevWizard\Textify\Providers\BaseProvider;
 
 /**
  * Mock provider for testing connect_timeout functionality
