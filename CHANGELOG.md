@@ -5,6 +5,44 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.3.0 - 2025-09-09
+
+### What's Added
+
+- **Message Validation System**: Comprehensive message validation with configurable rules
+  - Laravel-style validation configuration (`required`, `min`, `max`)
+  - Support for nullable messages via `TEXTIFY_MESSAGE_REQUIRED=false`
+  - Configurable minimum and maximum message length
+  - Proper validation error messages
+  
+
+### What's Enhanced
+
+- **Error Handling**: Improved error mapping and messages for all Bangladeshi SMS providers
+  - ReveSmsProvider: Enhanced error code mapping including error 114 handling
+  - AlphaSmsProvider: Better error message descriptions
+  - EsmsProvider: Improved error handling and status mapping
+  - DhorolaSmsProvider: Enhanced error code explanations
+  - MimSmsProvider: Better API response parsing
+  - BulkSmsBdProvider: Comprehensive error code mapping
+  
+
+### What's Fixed
+
+- **ReveSMS Error 114**: "Content not provided" error now prevented by pre-send validation
+- **Empty Message Handling**: Consistent behavior across all providers
+- **Whitespace Messages**: Properly validates and rejects whitespace-only messages
+
+### What's Technical
+
+- Added `validateMessageContent()` method to BaseProvider
+- Enhanced BaseProvider with proper phone number validation methods
+- Comprehensive test suite with 6 test cases
+- PHPStan validation passed
+- Backward compatible configuration
+
+**Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/compare/v1.2.0...v1.3.0
+
 ## v1.2.0 - 2025-09-07
 
 ### What's Changed
@@ -59,6 +97,7 @@ DHOROLA_CONNECT_TIMEOUT=15
 # Or for any other provider
 BULKSMSBD_CONNECT_TIMEOUT=8
 MIMSMS_CONNECT_TIMEOUT=12
+
 
 ```
 **Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/compare/v1.1.2...v1.2.0
