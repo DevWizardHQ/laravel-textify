@@ -316,7 +316,7 @@ abstract class BaseProvider implements TextifyProviderInterface
         $maxLength = config('textify.validation.message.max', null);
 
         $trimmedMessage = trim($message);
-        
+
         // Check if message is required but empty
         if ($required && empty($trimmedMessage)) {
             return [
@@ -326,7 +326,7 @@ abstract class BaseProvider implements TextifyProviderInterface
         }
 
         // Skip length validation if message is empty and not required
-        if (!$required && empty($trimmedMessage)) {
+        if (! $required && empty($trimmedMessage)) {
             return ['valid' => true];
         }
 
@@ -356,8 +356,8 @@ abstract class BaseProvider implements TextifyProviderInterface
     {
         // Basic validation - check if not empty and contains only digits, +, -, spaces, and parentheses
         $cleaned = preg_replace('/[\s\-\(\)]+/', '', $phoneNumber);
-        
-        return ! empty(trim($phoneNumber)) && 
+
+        return ! empty(trim($phoneNumber)) &&
                preg_match('/^\+?[0-9]{7,15}$/', $cleaned);
     }
 

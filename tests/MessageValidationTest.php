@@ -21,7 +21,7 @@ it('rejects empty messages by default (required)', function () {
 it('accepts empty messages when not required (nullable)', function () {
     // Temporarily override config to make message not required (nullable)
     config(['textify.validation.message.required' => false]);
-    
+
     $provider = new LogProvider([]);
 
     $message = TextifyMessage::create('01712345678', '', 'TestSender');
@@ -35,7 +35,7 @@ it('accepts empty messages when not required (nullable)', function () {
 
 it('rejects messages shorter than minimum length', function () {
     config(['textify.validation.message.min' => 5]);
-    
+
     $provider = new LogProvider([]);
 
     $message = TextifyMessage::create('01712345678', 'Hi', 'TestSender');
@@ -51,7 +51,7 @@ it('rejects messages shorter than minimum length', function () {
 
 it('rejects messages longer than maximum length', function () {
     config(['textify.validation.message.max' => 10]);
-    
+
     $provider = new LogProvider([]);
 
     $message = TextifyMessage::create('01712345678', 'This message is way too long', 'TestSender');
