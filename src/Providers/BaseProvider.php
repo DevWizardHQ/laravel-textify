@@ -132,6 +132,15 @@ abstract class BaseProvider implements TextifyProviderInterface
                 );
             }
 
+            // Validate message content
+            $messageValidationResult = $this->validateMessageContent($message->message);
+            if (! $messageValidationResult['valid']) {
+                return TextifyResponse::failed(
+                    errorMessage: $messageValidationResult['error'],
+                    errorCode: 'INVALID_MESSAGE_CONTENT'
+                );
+            }
+
             // Format phone number
             $formattedMessage = new TextifyMessage(
                 to: $this->formatPhoneNumber($message->to),
@@ -291,5 +300,74 @@ abstract class BaseProvider implements TextifyProviderInterface
                 )
             );
         }
+    }
+
+    /**
+     * Validate message content according to configuration rules
+     *
+     * @param  string  $message  The message content to validate
+     * @return array{valid: bool, error?: string}
+     */
+    protected function validateMessageContent(string $message): array
+    {
+        // Use Laravel-style validation config structure
+        $required = config('textify.validation.message.required', true);
+        $minLength = config('textify.validation.message.min', 1);
+        $maxLength = config('textify.validation.message.max', null);
+
+        $trimmedMessage = trim($message);
+
+        // Check if message is required but empty
+        if ($required && empty($trimmedMessage)) {
+            return [
+                'valid' => false,
+                'error' => 'The message field is required.',
+            ];
+        }
+
+        // Skip length validation if message is empty and not required
+        if (! $required && empty($trimmedMessage)) {
+            return ['valid' => true];
+        }
+
+        // Check minimum length (combines empty check with min length)
+        if (strlen($trimmedMessage) < $minLength) {
+            return [
+                'valid' => false,
+                'error' => sprintf('The message must be at least %d character%s.', $minLength, $minLength === 1 ? '' : 's'),
+            ];
+        }
+
+        // Check maximum length if specified
+        if ($maxLength !== null && strlen($trimmedMessage) > $maxLength) {
+            return [
+                'valid' => false,
+                'error' => sprintf('The message may not be greater than %d characters.', $maxLength),
+            ];
+        }
+
+        return ['valid' => true];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validatePhoneNumber(string $phoneNumber): bool
+    {
+        // Basic validation - check if not empty and contains only digits, +, -, spaces, and parentheses
+        $cleaned = preg_replace('/[\s\-\(\)]+/', '', $phoneNumber);
+
+        return ! empty(trim($phoneNumber)) &&
+               preg_match('/^\+?[0-9]{7,15}$/', $cleaned);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatPhoneNumber(string $phoneNumber): string
+    {
+        // Default implementation - just trim whitespace
+        // Providers should override this method for their specific formatting requirements
+        return trim($phoneNumber);
     }
 }

@@ -207,4 +207,27 @@ return [
     'events' => [
         'enabled' => env('TEXTIFY_EVENTS_ENABLED', true),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Message Validation
+    |--------------------------------------------------------------------------
+    |
+    | Configure validation rules for SMS messages before sending.
+    | Uses Laravel-style validation rules for consistency.
+    |
+    */
+
+    'validation' => [
+        'message' => [
+            // Set to false to allow empty messages
+            'required' => env('TEXTIFY_MESSAGE_REQUIRED', true),
+
+            // Minimum message length
+            'min' => env('TEXTIFY_MESSAGE_MIN_LENGTH', 1),
+
+            // Maximum message length (null = no limit)
+            'max' => env('TEXTIFY_MESSAGE_MAX_LENGTH', null),
+        ],
+    ],
 ];

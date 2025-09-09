@@ -119,7 +119,6 @@ class BulkSmsBdProvider extends BaseProvider
                     '1006' => 'Balance Validity Not Available',
                     '1007' => 'Balance Insufficient',
                     '1011' => 'User Id not found',
-                    // Add more error codes as needed
                 ];
                 $errorMessage = $errorMessages[$errorCode] ?? $responseText;
             }
