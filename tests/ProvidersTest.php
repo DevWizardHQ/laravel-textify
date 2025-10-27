@@ -379,7 +379,7 @@ it('can check balance with REVE SMS provider', function () {
         'secretkey' => 'test_secret_key',
         'client_id' => 'test_client_id',
         'sender_id' => 'TEST',
-        'balance_uri' => 'https://smpp.revesms.com',
+        'balance_uri' => 'http://apismpp.revesms.com',
         'timeout' => 30,
         'verify_ssl' => true,
     ]);

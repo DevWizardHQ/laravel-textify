@@ -18,7 +18,7 @@ class ReveSmsProvider extends BaseProvider
     protected function getClientConfig(): array
     {
         return [
-            'base_uri' => $this->config['base_uri'] ?? 'https://smpp.revesms.com:7790',
+            'base_uri' => $this->config['base_uri'] ?? 'http://apismpp.revesms.com',
             'timeout' => $this->config['timeout'] ?? 30,
             'verify' => $this->config['verify_ssl'] ?? false,
         ];
@@ -36,7 +36,7 @@ class ReveSmsProvider extends BaseProvider
 
     protected function sendRequest(TextifyMessage $message): array
     {
-        $query = [
+        $params = [
             'apikey' => $this->config['apikey'],
             'secretkey' => $this->config['secretkey'],
             'callerID' => $message->getFrom() ?? $this->config['sender_id'] ?? 'REVESMS',
@@ -44,8 +44,8 @@ class ReveSmsProvider extends BaseProvider
             'messageContent' => $message->getMessage(),
         ];
 
-        $response = $this->client->get('/sendtext', [
-            'query' => $query,
+        $response = $this->client->post('/sendtext', [
+            'form_params' => $params,
         ]);
 
         return json_decode($response->getBody()->getContents(), true);
@@ -134,7 +134,7 @@ class ReveSmsProvider extends BaseProvider
     {
         try {
             // Get balance URI from config or use default
-            $balanceUri = $this->config['balance_uri'] ?? 'https://smpp.revesms.com';
+            $balanceUri = $this->config['balance_uri'] ?? 'http://apismpp.revesms.com';
 
             // Create a separate client for balance API if needed
             $balanceClient = new \GuzzleHttp\Client([
