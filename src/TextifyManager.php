@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace DevWizard\Textify;
 
+use Closure;
 use DevWizard\Textify\Contracts\TextifyManagerInterface;
 use DevWizard\Textify\Contracts\TextifyProviderInterface;
 use DevWizard\Textify\DTOs\TextifyMessage;
 use DevWizard\Textify\DTOs\TextifyResponse;
 use DevWizard\Textify\Exceptions\TextifyException;
 use DevWizard\Textify\Jobs\SendTextifyJob;
+use Exception;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * TextifyManager - Core SMS management class
@@ -32,7 +35,7 @@ class TextifyManager implements TextifyManagerInterface
     /**
      * Registered SMS providers
      *
-     * @var array<string, TextifyProviderInterface|\Closure>
+     * @var array<string, TextifyProviderInterface|Closure>
      */
     protected array $providers = [];
 
@@ -85,9 +88,9 @@ class TextifyManager implements TextifyManagerInterface
      * lazy loading providers and dependency injection.
      *
      * @param  string  $name  Provider name identifier
-     * @param  TextifyProviderInterface|\Closure  $provider  Provider instance or factory
+     * @param  TextifyProviderInterface|Closure  $provider  Provider instance or factory
      */
-    public function extend(string $name, TextifyProviderInterface|\Closure $provider): self
+    public function extend(string $name, TextifyProviderInterface|Closure $provider): self
     {
         $this->providers[$name] = $provider;
 
@@ -123,10 +126,9 @@ class TextifyManager implements TextifyManagerInterface
      */
     public function to(string|array $contacts): self
     {
-        $clone = clone $this;
-        $clone->preparedContacts = $contacts;
+        $this->preparedContacts = $contacts;
 
-        return $clone;
+        return $this;
     }
 
     /**
@@ -134,10 +136,9 @@ class TextifyManager implements TextifyManagerInterface
      */
     public function message(string $message): self
     {
-        $clone = clone $this;
-        $clone->preparedMessage = $message;
+        $this->preparedMessage = $message;
 
-        return $clone;
+        return $this;
     }
 
     /**
@@ -145,10 +146,9 @@ class TextifyManager implements TextifyManagerInterface
      */
     public function from(string $from): self
     {
-        $clone = clone $this;
-        $clone->preparedFrom = $from;
+        $this->preparedFrom = $from;
 
-        return $clone;
+        return $this;
     }
 
     /**
@@ -179,7 +179,7 @@ class TextifyManager implements TextifyManagerInterface
         // Case 2a: Structured array with 'to' and 'message' keys
         // send([['to' => '01712345678', 'message' => 'msg1'], ['to' => '01812345678', 'message' => 'msg2']])
         if ($this->isStructuredArray($contacts)) {
-            return $this->sendStructuredArray($contacts);
+            return $this->sendStructuredArray($contacts, $from);
         }
 
         // Case 2b: Simple array of phone numbers with same message
@@ -208,14 +208,14 @@ class TextifyManager implements TextifyManagerInterface
     /**
      * Send structured array of messages
      */
-    protected function sendStructuredArray(array $messages): array
+    protected function sendStructuredArray(array $messages, ?string $defaultFrom = null): array
     {
         $responses = [];
         foreach ($messages as $messageData) {
             $textifyMessage = TextifyMessage::create(
                 $messageData['to'],
                 $messageData['message'],
-                $messageData['from'] ?? $this->preparedFrom,
+                $messageData['from'] ?? $defaultFrom,
                 $messageData['metadata'] ?? []
             );
             $responses[] = $this->getDriver()->send($textifyMessage);
@@ -243,10 +243,9 @@ class TextifyManager implements TextifyManagerInterface
      */
     public function via(string $driver): self
     {
-        $clone = clone $this;
-        $clone->defaultProvider = $driver;
+        $this->defaultProvider = $driver;
 
-        return $clone;
+        return $this;
     }
 
     /**
@@ -270,15 +269,19 @@ class TextifyManager implements TextifyManagerInterface
             throw new TextifyException('No message prepared for queue. Use message() method first.');
         }
 
-        // Handle single contact (string)
-        if (is_string($this->preparedContacts)) {
-            $textifyMessage = TextifyMessage::create(
-                $this->preparedContacts,
-                $this->preparedMessage,
-                $this->preparedFrom
-            );
+        // Capture prepared data before reset
+        $contacts = $this->preparedContacts;
+        $message = $this->preparedMessage;
+        $from = $this->preparedFrom;
+        $provider = $this->defaultProvider ?: 'default';
 
-            $job = new SendTextifyJob($textifyMessage, $this->defaultProvider ?: 'default');
+        // Reset prepared data after use (consistent with send() method)
+        $this->reset();
+
+        // Handle single contact (string)
+        if (is_string($contacts)) {
+            $textifyMessage = TextifyMessage::create($contacts, $message, $from);
+            $job = new SendTextifyJob($textifyMessage, $provider);
 
             if ($queueName) {
                 return dispatch($job)->onQueue($queueName);
@@ -291,31 +294,24 @@ class TextifyManager implements TextifyManagerInterface
         $jobs = [];
 
         // Case 1: Structured array with 'to' and 'message' keys
-        if ($this->isStructuredArray($this->preparedContacts)) {
-            foreach ($this->preparedContacts as $messageData) {
+        if ($this->isStructuredArray($contacts)) {
+            foreach ($contacts as $messageData) {
                 $textifyMessage = TextifyMessage::create(
                     $messageData['to'],
                     $messageData['message'],
-                    $messageData['from'] ?? $this->preparedFrom,
+                    $messageData['from'] ?? $from,
                     $messageData['metadata'] ?? []
                 );
 
-                $job = new SendTextifyJob($textifyMessage, $this->defaultProvider ?: 'default');
-
+                $job = new SendTextifyJob($textifyMessage, $provider);
                 $dispatchedJob = $queueName ? dispatch($job)->onQueue($queueName) : dispatch($job);
                 $jobs[] = $dispatchedJob;
             }
         } else {
             // Case 2: Simple array of phone numbers with same message
-            foreach ($this->preparedContacts as $phoneNumber) {
-                $textifyMessage = TextifyMessage::create(
-                    $phoneNumber,
-                    $this->preparedMessage,
-                    $this->preparedFrom
-                );
-
-                $job = new SendTextifyJob($textifyMessage, $this->defaultProvider ?: 'default');
-
+            foreach ($contacts as $phoneNumber) {
+                $textifyMessage = TextifyMessage::create($phoneNumber, $message, $from);
+                $job = new SendTextifyJob($textifyMessage, $provider);
                 $dispatchedJob = $queueName ? dispatch($job)->onQueue($queueName) : dispatch($job);
                 $jobs[] = $dispatchedJob;
             }
@@ -342,7 +338,7 @@ class TextifyManager implements TextifyManagerInterface
         $provider = $this->providers[$name];
 
         // If it's a closure (factory), call it to create the provider instance
-        if ($provider instanceof \Closure) {
+        if ($provider instanceof Closure) {
             $provider = $provider();
             // Cache the resolved provider
             $this->providers[$name] = $provider;
@@ -385,7 +381,7 @@ class TextifyManager implements TextifyManagerInterface
             }
 
             return $response;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // Try fallback on exception
             if ($this->fallbackProvider) {
                 Log::warning('Primary SMS provider threw exception, trying fallback', [
@@ -396,7 +392,7 @@ class TextifyManager implements TextifyManagerInterface
 
                 try {
                     return $this->via($this->fallbackProvider)->send($to, $message, $from);
-                } catch (\Throwable $fallbackException) {
+                } catch (Throwable $fallbackException) {
                     Log::error('Both primary and fallback SMS providers failed', [
                         'primary_error' => $e->getMessage(),
                         'fallback_error' => $fallbackException->getMessage(),
@@ -463,7 +459,7 @@ class TextifyManager implements TextifyManagerInterface
             $driver = $this->getDriver($driverName);
 
             return $driver->getBalance();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new TextifyException(
                 "Failed to get balance from provider '{$driverName}': ".$e->getMessage(),
                 0,
