@@ -8,6 +8,11 @@ use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
+    /**
+     * The latest test response (for testbench compatibility).
+     */
+    protected static $latestResponse = null;
+
     protected function setUp(): void
     {
         parent::setUp();
