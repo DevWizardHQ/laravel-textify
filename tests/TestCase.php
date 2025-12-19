@@ -8,7 +8,6 @@ use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
-
     /**
      * The latest test response (for testbench compatibility).
      */
