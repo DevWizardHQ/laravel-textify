@@ -5,6 +5,16 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.4.1 - 2025-12-19
+
+### What's Changed
+
+* chore(deps): configure local laravel-textify package for development and fix method chaining by @iqbalhasandev in https://github.com/DevWizardHQ/laravel-textify/pull/12
+* build(deps): Bump actions/checkout from 5 to 6 by @dependabot[bot] in https://github.com/DevWizardHQ/laravel-textify/pull/9
+* fix(bulk-sms): assign textify instance after setting sender to maintain method chain by @iqbalhasandev in https://github.com/DevWizardHQ/laravel-textify/pull/13
+
+**Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/compare/v1.4.0...v1.4.1
+
 ## v1.4.0 - 2025-10-27
 
 ### What's Changed
@@ -113,6 +123,7 @@ DHOROLA_CONNECT_TIMEOUT=15
 # Or for any other provider
 BULKSMSBD_CONNECT_TIMEOUT=8
 MIMSMS_CONNECT_TIMEOUT=12
+
 
 
 
