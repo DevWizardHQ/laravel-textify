@@ -45,7 +45,7 @@ Activate this skill when:
    }
    ```
 
-3. **Use the fluent builder** for complex sends. The fluent chain is immutable (each call returns a clone):
+3. **Use the fluent builder** for complex sends. Methods like `via()`, `to()`, `message()`, and `from()` return a clone; `fallback()` mutates the current instance:
    ```php
    // With specific provider
    $response = Textify::via('twilio')
@@ -59,7 +59,7 @@ Activate this skill when:
        ->fallback('bulksmsbd')
        ->to('01712345678')
        ->message('Critical alert!')
-       ->send();
+       ->sendWithFallback();
    ```
 
 4. **For multiple recipients, pass an array to `to()`**:
@@ -86,13 +86,13 @@ Activate this skill when:
    $response = Textify::send($phone, "Your OTP is {$otp}");
    ```
 
-6. **ALWAYS use `fallback()` for critical messages** (OTP, password reset, alerts):
+6. **ALWAYS use `fallback()` for critical messages** (OTP, password reset, alerts). Use `sendWithFallback()` to enable automatic fallback routing:
    ```php
    $response = Textify::via('dhorola')
        ->fallback('bulksmsbd')
        ->to($phone)
        ->message("Your verification code is {$code}")
-       ->send();
+       ->sendWithFallback();
    ```
 
 7. **NEVER hardcode provider names in application code** when possible. Use the config default:
@@ -248,7 +248,7 @@ Activate this skill when:
 
 16. **ALWAYS use the `array` driver in tests**, then assert against stored messages:
     ```php
-    use DevWizard\Textify\Providers\Development\ArrayProvider;
+    use DevWizard\Textify\Providers\ArrayProvider;
 
     // In test setup or phpunit.xml
     // TEXTIFY_PROVIDER=array
@@ -262,8 +262,8 @@ Activate this skill when:
 
         $messages = ArrayProvider::getMessages();
         $this->assertCount(1, $messages);
-        $this->assertStringContains('OTP', $messages[0]->getMessage());
-        $this->assertEquals('01712345678', $messages[0]->getTo());
+        $this->assertStringContainsString('OTP', $messages[0]['message']);
+        $this->assertEquals('01712345678', $messages[0]['to']);
     }
 
     protected function tearDown(): void
