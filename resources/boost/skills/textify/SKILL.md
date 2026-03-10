@@ -338,12 +338,13 @@ class OtpController extends Controller
 
         $otp = random_int(100000, 999999);
         cache()->put("otp:{$request->phone}", $otp, now()->addMinutes(5));
+        cache()->put("otp_attempts:{$request->phone}", 0, now()->addMinutes(5));
 
         $response = Textify::via(config('textify.default'))
             ->fallback(config('textify.fallback'))
             ->to($request->phone)
             ->message(__('Your verification code is :code. Valid for 5 minutes.', ['code' => $otp]))
-            ->send();
+            ->sendWithFallback();
 
         if ($response->isFailed()) {
             return back()->withErrors(['phone' => __('Failed to send OTP. Please try again.')]);
@@ -359,11 +360,31 @@ class OtpController extends Controller
             'otp' => 'required|digits:6',
         ]);
 
+        // Rate limit: max 5 attempts per phone number
+        $attemptsKey = "otp_attempts:{$request->phone}";
+        $attempts = (int) cache()->get($attemptsKey, 0);
+
+        if ($attempts >= 5) {
+            cache()->forget("otp:{$request->phone}");
+            cache()->forget($attemptsKey);
+
+            return back()->withErrors(['otp' => __('Too many attempts. Please request a new OTP.')]);
+        }
+
+        cache()->increment($attemptsKey);
+
         $cached = cache()->pull("otp:{$request->phone}");
 
         if (!$cached || (int) $request->otp !== $cached) {
+            // Put back so subsequent attempts can still match (pull removes it)
+            if ($cached) {
+                cache()->put("otp:{$request->phone}", $cached, now()->addMinutes(5));
+            }
+
             return back()->withErrors(['otp' => __('Invalid or expired OTP.')]);
         }
+
+        cache()->forget($attemptsKey);
 
         // OTP verified — proceed with action
     }
@@ -473,7 +494,7 @@ php artisan textify:table                                    # Publish activity 
 |---|---|
 | Instantiating providers directly | Use `Textify::` facade or `Textify::via('name')` |
 | Sending SMS synchronously in web requests for non-critical messages | Use `->queue()` for non-critical SMS |
-| No fallback for OTP/critical messages | ALWAYS use `->fallback('provider')` |
+| No fallback for OTP/critical messages | Use `->fallback('provider')->sendWithFallback()` |
 | Hardcoding `Textify::via('dhorola')` everywhere | Set `TEXTIFY_PROVIDER` in `.env`, use default |
 | Running real SMS in tests | Set `TEXTIFY_PROVIDER=array` in test env |
 | Not checking `$response->isSuccessful()` | ALWAYS check response and handle failures |
