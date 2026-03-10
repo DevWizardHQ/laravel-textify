@@ -5,6 +5,15 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.5.0 - 2026-03-10
+
+### What's Changed
+
+* build(deps): Bump dependabot/fetch-metadata from 2.4.0 to 2.5.0 by @dependabot[bot] in https://github.com/DevWizardHQ/laravel-textify/pull/14
+* feat: add support for SMS sending with Textify skill documentation by @iqbalhasandev in https://github.com/DevWizardHQ/laravel-textify/pull/15
+
+**Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/compare/v1.4.1...v1.5.0
+
 ## v1.4.1 - 2025-12-19
 
 ### What's Changed
@@ -123,6 +132,7 @@ DHOROLA_CONNECT_TIMEOUT=15
 # Or for any other provider
 BULKSMSBD_CONNECT_TIMEOUT=8
 MIMSMS_CONNECT_TIMEOUT=12
+
 
 
 
