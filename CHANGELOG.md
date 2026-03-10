@@ -5,6 +5,14 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.5.1 - 2026-03-10
+
+### What's Changed
+
+* fix: address review feedback on SKILL.md documentation by @iqbalhasandev in https://github.com/DevWizardHQ/laravel-textify/pull/16
+
+**Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/compare/v1.5.0...v1.5.1
+
 ## v1.5.0 - 2026-03-10
 
 ### What's Changed
@@ -132,6 +140,7 @@ DHOROLA_CONNECT_TIMEOUT=15
 # Or for any other provider
 BULKSMSBD_CONNECT_TIMEOUT=8
 MIMSMS_CONNECT_TIMEOUT=12
+
 
 
 
