@@ -5,6 +5,16 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.6.0 - 2026-04-11
+
+### What's Changed
+
+* Add Laravel 13 support by @iqbalhasandev in https://github.com/DevWizardHQ/laravel-textify/pull/19
+* build(deps): Bump dependabot/fetch-metadata from 2.5.0 to 3.0.0 by @dependabot[bot] in https://github.com/DevWizardHQ/laravel-textify/pull/18
+* build(deps): Bump ramsey/composer-install from 3 to 4 by @dependabot[bot] in https://github.com/DevWizardHQ/laravel-textify/pull/17
+
+**Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/compare/v1.5.1...v1.6.0
+
 ## v1.5.1 - 2026-03-10
 
 ### What's Changed
@@ -140,6 +150,7 @@ DHOROLA_CONNECT_TIMEOUT=15
 # Or for any other provider
 BULKSMSBD_CONNECT_TIMEOUT=8
 MIMSMS_CONNECT_TIMEOUT=12
+
 
 
 
