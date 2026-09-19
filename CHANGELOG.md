@@ -5,6 +5,17 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.6.2 - 2026-09-19
+
+### What's Changed
+
+* build(deps): Bump dependabot/fetch-metadata from 3.0.0 to 3.1.0 by @dependabot[bot] in https://github.com/DevWizardHQ/laravel-textify/pull/23
+* build(deps): Update guzzlehttp/guzzle requirement from ^7.0 to ^8.2 by @dependabot[bot] in https://github.com/DevWizardHQ/laravel-textify/pull/27
+* build(deps): Bump actions/checkout from 6 to 7 by @dependabot[bot] in https://github.com/DevWizardHQ/laravel-textify/pull/24
+* chore(deps): allow guzzlehttp/guzzle ^8.0 by @iqbalhasandev in https://github.com/DevWizardHQ/laravel-textify/pull/28
+
+**Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/compare/v1.6.1...v1.6.2
+
 ## v1.6.1 - 2026-04-12
 
 ### What's Changed
@@ -160,6 +171,7 @@ DHOROLA_CONNECT_TIMEOUT=15
 # Or for any other provider
 BULKSMSBD_CONNECT_TIMEOUT=8
 MIMSMS_CONNECT_TIMEOUT=12
+
 
 
 
