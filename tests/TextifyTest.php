@@ -6,6 +6,7 @@ use DevWizard\Textify\DTOs\TextifyMessage;
 use DevWizard\Textify\DTOs\TextifyResponse;
 use DevWizard\Textify\Facades\Textify;
 use DevWizard\Textify\Providers\ArrayProvider;
+use DevWizard\Textify\Providers\Bangladeshi\DhorolaSmsProvider;
 
 it('can send SMS using array driver', function () {
     // Clear any existing messages
@@ -110,7 +111,7 @@ it('can send personalized messages to different numbers', function () {
     expect($storedMessages[2]['message'])->toContain('Mike');
 });
 it('validates bangladeshi phone numbers correctly', function () {
-    $provider = new \DevWizard\Textify\Providers\Bangladeshi\DhorolaSmsProvider([
+    $provider = new DhorolaSmsProvider([
         'api_key' => 'test',
         'sender_id' => 'test',
         'base_uri' => 'https://test.com',
@@ -129,7 +130,7 @@ it('validates bangladeshi phone numbers correctly', function () {
 });
 
 it('formats bangladeshi phone numbers correctly', function () {
-    $provider = new \DevWizard\Textify\Providers\Bangladeshi\DhorolaSmsProvider([
+    $provider = new DhorolaSmsProvider([
         'api_key' => 'test',
         'sender_id' => 'test',
         'base_uri' => 'https://test.com',
