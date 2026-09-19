@@ -312,7 +312,7 @@ abstract class BaseProvider implements TextifyProviderInterface
     {
         // Use Laravel-style validation config structure
         $required = config('textify.validation.message.required', true);
-        $minLength = config('textify.validation.message.min', 1);
+        $minLength = (int) config('textify.validation.message.min', 1);
         $maxLength = config('textify.validation.message.max', null);
 
         $trimmedMessage = trim($message);
@@ -334,7 +334,7 @@ abstract class BaseProvider implements TextifyProviderInterface
         if (strlen($trimmedMessage) < $minLength) {
             return [
                 'valid' => false,
-                'error' => sprintf('The message must be at least %d character%s.', $minLength, $minLength === 1 ? '' : 's'),
+                'error' => sprintf('The message must be at least %d characters.', $minLength),
             ];
         }
 
