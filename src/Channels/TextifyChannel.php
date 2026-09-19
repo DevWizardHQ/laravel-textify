@@ -33,9 +33,9 @@ class TextifyChannel
      * Send the given notification
      *
      * @param  mixed  $notifiable  The notifiable entity (User, etc.)
-     * @param  \Illuminate\Notifications\Notification  $notification  The notification instance
+     * @param  Notification  $notification  The notification instance
      *
-     * @throws \DevWizard\Textify\Exceptions\TextifyException
+     * @throws TextifyException
      */
     public function send($notifiable, Notification $notification): ?TextifyResponse
     {

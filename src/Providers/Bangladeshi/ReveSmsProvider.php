@@ -7,6 +7,7 @@ namespace DevWizard\Textify\Providers\Bangladeshi;
 use DevWizard\Textify\DTOs\TextifyMessage;
 use DevWizard\Textify\DTOs\TextifyResponse;
 use DevWizard\Textify\Providers\BaseProvider;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
 class ReveSmsProvider extends BaseProvider
@@ -137,7 +138,7 @@ class ReveSmsProvider extends BaseProvider
             $balanceUri = $this->config['balance_uri'] ?? 'http://apismpp.revesms.com';
 
             // Create a separate client for balance API if needed
-            $balanceClient = new \GuzzleHttp\Client([
+            $balanceClient = new Client([
                 'base_uri' => $balanceUri,
                 'timeout' => $this->config['timeout'] ?? 30,
                 'verify' => $this->config['verify_ssl'] ?? false,

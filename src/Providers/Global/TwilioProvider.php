@@ -8,6 +8,7 @@ use DevWizard\Textify\DTOs\TextifyMessage;
 use DevWizard\Textify\DTOs\TextifyResponse;
 use DevWizard\Textify\Exceptions\TextifyException;
 use DevWizard\Textify\Providers\BaseProvider;
+use Twilio\Rest\Client;
 
 class TwilioProvider extends BaseProvider
 {
@@ -46,7 +47,7 @@ class TwilioProvider extends BaseProvider
         }
 
         try {
-            $this->twilioClient = new \Twilio\Rest\Client(
+            $this->twilioClient = new Client(
                 $this->config['account_sid'],
                 $this->config['auth_token']
             );

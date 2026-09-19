@@ -12,6 +12,10 @@ use DevWizard\Textify\Providers\Bangladeshi\DhorolaSmsProvider;
 use DevWizard\Textify\Providers\Bangladeshi\EsmsProvider;
 use DevWizard\Textify\Providers\Bangladeshi\MimSmsProvider;
 use DevWizard\Textify\Providers\Bangladeshi\ReveSmsProvider;
+use DevWizard\Textify\Providers\Global\NexmoPlaceholderProvider;
+use DevWizard\Textify\Providers\Global\NexmoProvider;
+use DevWizard\Textify\Providers\Global\TwilioPlaceholderProvider;
+use DevWizard\Textify\Providers\Global\TwilioProvider;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -77,7 +81,7 @@ it('can instantiate all new global SMS providers', function () {
             'api_secret' => 'test_api_secret',
             'from' => 'Vonage',
         ];
-        $nexmoProvider = new \DevWizard\Textify\Providers\Global\NexmoProvider($nexmoConfig);
+        $nexmoProvider = new NexmoProvider($nexmoConfig);
         expect($nexmoProvider->getName())->toBe('nexmo');
         $providersCreated++;
     }
@@ -89,15 +93,15 @@ it('can instantiate all new global SMS providers', function () {
             'auth_token' => 'test_auth_token',
             'from' => '+1234567890',
         ];
-        $twilioProvider = new \DevWizard\Textify\Providers\Global\TwilioProvider($twilioConfig);
+        $twilioProvider = new TwilioProvider($twilioConfig);
         expect($twilioProvider->getName())->toBe('twilio');
         $providersCreated++;
     }
 
     // Ensure at least the placeholder providers can be checked for their class names
     // without instantiating them (since they throw exceptions on validateConfig)
-    expect(class_exists(\DevWizard\Textify\Providers\Global\NexmoPlaceholderProvider::class))->toBeTrue();
-    expect(class_exists(\DevWizard\Textify\Providers\Global\TwilioPlaceholderProvider::class))->toBeTrue();
+    expect(class_exists(NexmoPlaceholderProvider::class))->toBeTrue();
+    expect(class_exists(TwilioPlaceholderProvider::class))->toBeTrue();
 
     // This test verifies that we have access to both real and placeholder global provider classes
     // Even if no providers are instantiated due to missing dependencies, we confirm the structure exists
@@ -140,7 +144,7 @@ it('can send SMS with Nexmo provider', function () {
         }
     };
 
-    $provider = new \DevWizard\Textify\Providers\Global\NexmoProvider([
+    $provider = new NexmoProvider([
         'api_key' => 'test_api_key',
         'api_secret' => 'test_api_secret',
         'from' => 'Vonage',
@@ -305,7 +309,7 @@ it('validates phone numbers correctly for different providers', function () {
 
     // Only add NexmoProvider if Vonage client is available
     if (class_exists(\Vonage\Client::class)) {
-        $globalProviders[] = new \DevWizard\Textify\Providers\Global\NexmoProvider(['api_key' => 'test', 'api_secret' => 'test', 'from' => 'test']);
+        $globalProviders[] = new NexmoProvider(['api_key' => 'test', 'api_secret' => 'test', 'from' => 'test']);
     }
 
     foreach ($globalProviders as $provider) {
@@ -357,7 +361,7 @@ it('formats phone numbers correctly for different providers', function () {
 
     // Only add NexmoProvider if Vonage client is available
     if (class_exists(\Vonage\Client::class)) {
-        $globalProviders[] = new \DevWizard\Textify\Providers\Global\NexmoProvider(['api_key' => 'test', 'api_secret' => 'test', 'from' => 'test']);
+        $globalProviders[] = new NexmoProvider(['api_key' => 'test', 'api_secret' => 'test', 'from' => 'test']);
     }
 
     foreach ($globalProviders as $provider) {

@@ -21,7 +21,7 @@ it('dispatches TextifyJobFailed event when job fails', function () {
     );
 
     $job = new SendTextifyJob($message, 'test-provider');
-    $exception = new \Exception('Test failure message');
+    $exception = new Exception('Test failure message');
 
     // Simulate job failure
     $job->failed($exception);
@@ -42,7 +42,7 @@ it('creates TextifyJobFailed event with correct properties', function () {
         from: 'Sender123'
     );
 
-    $exception = new \Exception('Connection failed', 500);
+    $exception = new Exception('Connection failed', 500);
     $event = new TextifyJobFailed($message, 'revesms', $exception);
 
     expect($event->getMessage())->toBe($message);
@@ -62,7 +62,7 @@ it('provides comprehensive metadata for TextifyJobFailed event', function () {
         from: 'TestApp'
     );
 
-    $exception = new \Exception('API Error', 400);
+    $exception = new Exception('API Error', 400);
     $event = new TextifyJobFailed($message, 'mimsms', $exception);
 
     $metadata = $event->getMetadata();

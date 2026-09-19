@@ -24,9 +24,9 @@ class TextifyActivity extends Model
      * @property string|null $error_message
      * @property float|null $cost
      * @property array $metadata
-     * @property \Carbon\Carbon|null $sent_at
-     * @property \Carbon\Carbon $created_at
-     * @property \Carbon\Carbon $updated_at
+     * @property Carbon|null $sent_at
+     * @property Carbon $created_at
+     * @property Carbon $updated_at
      */
     protected $fillable = [
         'message_id',
