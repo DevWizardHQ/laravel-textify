@@ -5,6 +5,16 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.6.3 - 2026-09-20
+
+Maintenance release. No user-facing behaviour changes.
+
+### Dependencies
+
+- Allow Pest 5 alongside 2, 3 and 4, added to the existing ranges rather than replacing them so CI legs on older PHP keep resolving a supported Pest.
+
+63 tests pass, PHPStan clean.
+
 ## v1.6.2 - 2026-09-19
 
 ### What's Changed
@@ -171,6 +181,7 @@ DHOROLA_CONNECT_TIMEOUT=15
 # Or for any other provider
 BULKSMSBD_CONNECT_TIMEOUT=8
 MIMSMS_CONNECT_TIMEOUT=12
+
 
 
 
