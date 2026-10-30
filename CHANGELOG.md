@@ -5,6 +5,21 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.7.0 - 2026-10-30
+
+### Breaking
+
+- **Requires Laravel 12 or 13.** Laravel 10 and 11 are past end of life, and Composer now refuses to install them because every one of their versions has open security advisories. Apps still on Laravel 10 or 11 keep resolving to the previous release.
+
+### Maintenance
+
+- `actions/checkout` 5 to 7.
+- Removed the `dependabot-auto-merge` workflow; Dependabot updates are now reviewed by hand.
+- Removed the PolinRider supply-chain scan workflow and the repository git hooks. Force pushes are blocked by a branch ruleset and secret scanning with push protection is on.
+- Git hook files are excluded from the Composer archive.
+
+**Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/compare/v1.6.3...v1.7.0
+
 ## v1.6.3 - 2026-09-20
 
 Maintenance release. No user-facing behaviour changes.
@@ -181,6 +196,7 @@ DHOROLA_CONNECT_TIMEOUT=15
 # Or for any other provider
 BULKSMSBD_CONNECT_TIMEOUT=8
 MIMSMS_CONNECT_TIMEOUT=12
+
 
 
 
