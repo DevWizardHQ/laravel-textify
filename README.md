@@ -100,7 +100,7 @@ php artisan migrate
 ### 📋 Requirements
 
 -   **PHP**: 8.3 or higher
--   **Laravel**: 10.0, 11.0, or 12.0
+-   **Laravel**: 12.0 or 13.0
 -   **Extensions**: cURL, JSON
 
 ## Configuration
