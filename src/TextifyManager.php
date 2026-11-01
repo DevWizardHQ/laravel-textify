@@ -422,9 +422,15 @@ class TextifyManager implements TextifyManagerInterface
         $fallbackErrorCodes = [
             'INSUFFICIENT_BALANCE',
             'RATE_LIMIT_EXCEEDED',
-            'PROVIDER_ERROR',
             'NETWORK_ERROR',
+            TextifyResponse::ERROR_PROVIDER_ERROR,
+            TextifyResponse::ERROR_CONNECTION_FAILED,
+            TextifyResponse::ERROR_SERVER_ERROR,
         ];
+
+        if ($this->config['fallback_on_timeout'] ?? false) {
+            $fallbackErrorCodes[] = TextifyResponse::ERROR_TIMEOUT;
+        }
 
         return in_array($response->getErrorCode(), $fallbackErrorCodes, true);
     }

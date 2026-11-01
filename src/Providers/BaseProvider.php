@@ -14,6 +14,10 @@ use DevWizard\Textify\Events\TextifySent;
 use DevWizard\Textify\Exceptions\TextifyException;
 use DevWizard\Textify\Factories\ActivityTrackerFactory;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Exception\TransferException;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -128,7 +132,7 @@ abstract class BaseProvider implements TextifyProviderInterface
             if (! $this->validatePhoneNumber($message->to)) {
                 return TextifyResponse::failed(
                     errorMessage: 'Invalid phone number format',
-                    errorCode: 'INVALID_PHONE_NUMBER'
+                    errorCode: TextifyResponse::ERROR_INVALID_PHONE_NUMBER
                 );
             }
 
@@ -137,7 +141,7 @@ abstract class BaseProvider implements TextifyProviderInterface
             if (! $messageValidationResult['valid']) {
                 return TextifyResponse::failed(
                     errorMessage: $messageValidationResult['error'],
-                    errorCode: 'INVALID_MESSAGE_CONTENT'
+                    errorCode: TextifyResponse::ERROR_INVALID_MESSAGE_CONTENT
                 );
             }
 
@@ -202,7 +206,7 @@ abstract class BaseProvider implements TextifyProviderInterface
         } catch (\Throwable $e) {
             $response = TextifyResponse::failed(
                 errorMessage: $e->getMessage(),
-                errorCode: 'PROVIDER_ERROR'
+                errorCode: $this->classifySendException($e)
             );
 
             // Track failed activity
@@ -220,6 +224,54 @@ abstract class BaseProvider implements TextifyProviderInterface
 
             return $response;
         }
+    }
+
+    /**
+     * TIMEOUT means the request may have reached the provider, so the SMS may already be sent.
+     */
+    protected function classifySendException(\Throwable $exception): string
+    {
+        for ($current = $exception; $current !== null; $current = $current->getPrevious()) {
+            if ($current instanceof ServerException) {
+                return $current->getResponse()->getStatusCode() === 504
+                    ? TextifyResponse::ERROR_TIMEOUT
+                    : TextifyResponse::ERROR_SERVER_ERROR;
+            }
+
+            if ($current instanceof BadResponseException) {
+                return TextifyResponse::ERROR_PROVIDER_ERROR;
+            }
+
+            if ($current instanceof ConnectException) {
+                return $this->isTransferTimeout($current->getMessage())
+                    ? TextifyResponse::ERROR_TIMEOUT
+                    : TextifyResponse::ERROR_CONNECTION_FAILED;
+            }
+
+            if ($current instanceof TransferException) {
+                return TextifyResponse::ERROR_TIMEOUT;
+            }
+        }
+
+        return TextifyResponse::ERROR_PROVIDER_ERROR;
+    }
+
+    /**
+     * Guzzle 7 reports every cURL timeout (errno 28) as ConnectException; only connect-phase ones are safe.
+     */
+    private function isTransferTimeout(string $message): bool
+    {
+        if (! str_contains($message, 'cURL error 28')) {
+            return false;
+        }
+
+        foreach (['Connection timed out', 'Connection timeout', 'Connection time-out', 'Resolving timed out', 'name lookup timed out', 'Proxy CONNECT aborted due to timeout'] as $connectPhase) {
+            if (stripos($message, $connectPhase) !== false) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

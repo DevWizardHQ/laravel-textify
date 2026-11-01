@@ -50,14 +50,35 @@ class SendTextifyJob implements ShouldQueue
             ? Textify::via($this->provider)->send($this->message->to, $this->message->message, $this->message->from)
             : Textify::send($this->message->to, $this->message->message, $this->message->from);
 
-        if ($response instanceof TextifyResponse && $response->isFailed() && config('textify.queue.retry_failed_sends', true)) {
-            throw new TextifyException(
-                "SMS to {$this->message->to} failed: {$response->getErrorMessage()}",
-                0,
-                null,
-                $this->provider
-            );
+        if (! $response instanceof TextifyResponse || ! $response->isFailed()) {
+            return;
         }
+
+        $exception = new TextifyException(
+            "SMS to {$this->message->to} failed ({$response->getErrorCode()}): {$response->getErrorMessage()}",
+            0,
+            null,
+            $this->provider
+        );
+
+        if ($this->shouldRetry($response->getErrorCode())) {
+            throw $exception;
+        }
+
+        $this->fail($exception);
+    }
+
+    protected function shouldRetry(?string $errorCode): bool
+    {
+        $retry = config('textify.queue.retry', []);
+
+        return match ($errorCode) {
+            TextifyResponse::ERROR_CONNECTION_FAILED => (bool) ($retry['connection_errors'] ?? true),
+            TextifyResponse::ERROR_SERVER_ERROR => (bool) ($retry['server_errors'] ?? true),
+            TextifyResponse::ERROR_TIMEOUT => (bool) ($retry['timeouts'] ?? false),
+            TextifyResponse::ERROR_INVALID_PHONE_NUMBER, TextifyResponse::ERROR_INVALID_MESSAGE_CONTENT => false,
+            default => (bool) ($retry['provider_errors'] ?? false),
+        };
     }
 
     /**

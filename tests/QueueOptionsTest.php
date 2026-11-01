@@ -47,18 +47,54 @@ it('reads queue options from config', function () {
         ->and($job->delay)->toBe(30);
 });
 
-it('throws on a failed send so the queue retries it', function () {
-    Textify::shouldReceive('send')->once()->andReturn(TextifyResponse::failed(errorMessage: 'IP not allowed', errorCode: '-59'));
+function handleQueuedFailure(string $errorCode): SendTextifyJob
+{
+    Textify::shouldReceive('send')->once()->andReturn(TextifyResponse::failed(errorMessage: 'boom', errorCode: $errorCode));
 
-    expect(fn () => (new SendTextifyJob(queuedMessage()))->handle())
-        ->toThrow(TextifyException::class, 'IP not allowed');
+    $job = (new SendTextifyJob(queuedMessage()))->withFakeQueueInteractions();
+    $job->handle();
+
+    return $job;
+}
+
+it('retries failures where the SMS was never sent', function (string $errorCode) {
+    expect(fn () => handleQueuedFailure($errorCode))->toThrow(TextifyException::class, $errorCode);
+})->with([
+    TextifyResponse::ERROR_CONNECTION_FAILED,
+    TextifyResponse::ERROR_SERVER_ERROR,
+]);
+
+it('fails without retrying when a retry could duplicate or cannot help', function (string $errorCode) {
+    handleQueuedFailure($errorCode)->assertFailed();
+})->with([
+    TextifyResponse::ERROR_TIMEOUT,
+    TextifyResponse::ERROR_PROVIDER_ERROR,
+    TextifyResponse::ERROR_INVALID_PHONE_NUMBER,
+    '-59',
+]);
+
+it('retries timeouts and provider errors when enabled', function (string $errorCode) {
+    config()->set('textify.queue.retry', ['timeouts' => true, 'provider_errors' => true]);
+
+    expect(fn () => handleQueuedFailure($errorCode))->toThrow(TextifyException::class);
+})->with([
+    TextifyResponse::ERROR_TIMEOUT,
+    '-59',
+]);
+
+it('never retries invalid input even when provider errors retry', function () {
+    config()->set('textify.queue.retry.provider_errors', true);
+
+    handleQueuedFailure(TextifyResponse::ERROR_INVALID_MESSAGE_CONTENT)->assertFailed();
 });
 
-it('does not throw on a failed send when retry_failed_sends is off', function () {
-    config()->set('textify.queue.retry_failed_sends', false);
-    Textify::shouldReceive('send')->once()->andReturn(TextifyResponse::failed(errorMessage: 'IP not allowed', errorCode: '-59'));
+it('does nothing more after a successful send', function () {
+    Textify::shouldReceive('send')->once()->andReturn(TextifyResponse::success(messageId: '1'));
 
-    expect(fn () => (new SendTextifyJob(queuedMessage()))->handle())->not->toThrow(TextifyException::class);
+    $job = (new SendTextifyJob(queuedMessage()))->withFakeQueueInteractions();
+    $job->handle();
+
+    $job->assertNotFailed();
 });
 
 it('spaces bulk queued messages by the cooldown and honours the queue name override', function () {
