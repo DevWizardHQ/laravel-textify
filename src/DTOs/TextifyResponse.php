@@ -23,6 +23,18 @@ namespace DevWizard\Textify\DTOs;
  */
 class TextifyResponse
 {
+    public const ERROR_CONNECTION_FAILED = 'CONNECTION_FAILED';
+
+    public const ERROR_SERVER_ERROR = 'SERVER_ERROR';
+
+    public const ERROR_TIMEOUT = 'TIMEOUT';
+
+    public const ERROR_PROVIDER_ERROR = 'PROVIDER_ERROR';
+
+    public const ERROR_INVALID_PHONE_NUMBER = 'INVALID_PHONE_NUMBER';
+
+    public const ERROR_INVALID_MESSAGE_CONTENT = 'INVALID_MESSAGE_CONTENT';
+
     /**
      * Create a new TextifyResponse instance
      *

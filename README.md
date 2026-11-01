@@ -123,6 +123,7 @@ Add these to your `.env` file based on the providers you want to use:
 # Primary Provider Selection
 TEXTIFY_PROVIDER=mimsms
 TEXTIFY_FALLBACK_PROVIDER=revesms
+TEXTIFY_FALLBACK_ON_TIMEOUT=false   # true can send the SMS twice
 
 # ===== BANGLADESHI PROVIDERS =====
 
@@ -217,10 +218,18 @@ TEXTIFY_LOG_SUCCESSFUL=true
 TEXTIFY_LOG_FAILED=true
 TEXTIFY_LOG_CHANNEL=stack
 
-# Queue Configuration
-TEXTIFY_QUEUE_ENABLED=true
-TEXTIFY_QUEUE_CONNECTION=redis
-TEXTIFY_QUEUE_NAME=sms
+# Queue Configuration (all optional, defaults shown)
+TEXTIFY_QUEUE_CONNECTION=          # empty = app default connection
+TEXTIFY_QUEUE_NAME=                # empty = connection's default queue
+TEXTIFY_QUEUE_TRIES=3
+TEXTIFY_QUEUE_BACKOFF=10,30,60     # seconds between retries
+TEXTIFY_QUEUE_TIMEOUT=60
+TEXTIFY_QUEUE_DELAY=0              # seconds before a queued SMS is processed
+TEXTIFY_QUEUE_COOLDOWN=0           # extra seconds between each SMS of one bulk queue() call
+TEXTIFY_QUEUE_RETRY_CONNECTION_ERRORS=true   # never reached the provider
+TEXTIFY_QUEUE_RETRY_SERVER_ERRORS=true       # provider returned 5xx
+TEXTIFY_QUEUE_RETRY_TIMEOUTS=false           # may already be sent
+TEXTIFY_QUEUE_RETRY_PROVIDER_ERRORS=false    # bad key, IP not allowed, invalid number
 ```
 
 ## 🚀 Quick Start
@@ -672,6 +681,21 @@ Textify::to('01712345678')
     ->message('Priority message')
     ->queue('high-priority');
 ```
+
+Queued jobs use the `queue` section of `config/textify.php`: connection, queue name, tries, backoff, timeout, initial delay and a cooldown that spaces out bulk sends (with `TEXTIFY_QUEUE_COOLDOWN=5`, three numbers go out at 0s, 5s and 10s). 
+Failed sends are sorted by whether the SMS may already have gone out, and each kind has its own retry switch. A kind that is not retried fails the job at once (it shows in `failed_jobs` and fires `TextifyJobFailed`).
+
+| Error code | What happened | Retried by default |
+|---|---|---|
+| `CONNECTION_FAILED` | DNS, refused, SSL or connect timeout; the provider never got the request | Yes |
+| `SERVER_ERROR` | Provider answered 5xx (except 504) | Yes |
+| `TIMEOUT` | Request sent but no answer (response timeout, dropped connection, 504); the SMS may already be sent | No |
+| `PROVIDER_ERROR` / provider codes | Provider rejected it (bad key, IP not allowed, invalid number) | No |
+| `INVALID_PHONE_NUMBER`, `INVALID_MESSAGE_CONTENT` | Rejected before sending | Never |
+
+The fallback provider follows the same rule: it is used on `CONNECTION_FAILED`, `SERVER_ERROR` and `PROVIDER_ERROR`, but not on `TIMEOUT` unless `TEXTIFY_FALLBACK_ON_TIMEOUT=true`.
+
+Keep `TEXTIFY_QUEUE_TIMEOUT` above the provider's `timeout` + `connect_timeout`, or the worker kills the job mid-request and the result is unknown.
 
 ### Event Handling
 

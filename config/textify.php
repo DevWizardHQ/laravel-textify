@@ -31,6 +31,9 @@ return [
 
     'fallback' => env('TEXTIFY_FALLBACK_PROVIDER'),
 
+    // A timed-out request may already have been sent; falling back could deliver the SMS twice.
+    'fallback_on_timeout' => (bool) env('TEXTIFY_FALLBACK_ON_TIMEOUT', false),
+
     /*
     |--------------------------------------------------------------------------
     | SMS Providers
@@ -217,6 +220,43 @@ return [
 
     'events' => [
         'enabled' => env('TEXTIFY_EVENTS_ENABLED', true),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Queue Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Applies to messages sent with ->queue().
+    | - connection / name: queue connection and queue name (null = app default)
+    | - tries, backoff, timeout: job retry attempts, seconds between retries
+    |   (single number or comma list like "10,30,60"), max job run time
+    | - delay: seconds before a queued message is processed
+    | - cooldown: extra seconds between each message of one bulk queue() call
+    | - retry: which failures retry the job. Others fail the job at once.
+    |   connection_errors: the request never reached the provider (safe)
+    |   server_errors: the provider answered 5xx without processing it
+    |   timeouts: the request was sent but no answer came back; the SMS
+    |     may already be sent, so retrying can deliver it twice
+    |   provider_errors: the provider rejected it (bad key, IP not allowed,
+    |     invalid number); retrying rarely helps
+    |
+    */
+
+    'queue' => [
+        'connection' => env('TEXTIFY_QUEUE_CONNECTION'),
+        'name' => env('TEXTIFY_QUEUE_NAME'),
+        'tries' => (int) env('TEXTIFY_QUEUE_TRIES', 3),
+        'backoff' => env('TEXTIFY_QUEUE_BACKOFF', '10,30,60'),
+        'timeout' => (int) env('TEXTIFY_QUEUE_TIMEOUT', 60),
+        'delay' => (int) env('TEXTIFY_QUEUE_DELAY', 0),
+        'cooldown' => (int) env('TEXTIFY_QUEUE_COOLDOWN', 0),
+        'retry' => [
+            'connection_errors' => (bool) env('TEXTIFY_QUEUE_RETRY_CONNECTION_ERRORS', true),
+            'server_errors' => (bool) env('TEXTIFY_QUEUE_RETRY_SERVER_ERRORS', true),
+            'timeouts' => (bool) env('TEXTIFY_QUEUE_RETRY_TIMEOUTS', false),
+            'provider_errors' => (bool) env('TEXTIFY_QUEUE_RETRY_PROVIDER_ERRORS', false),
+        ],
     ],
 
     /*
