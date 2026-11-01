@@ -210,6 +210,32 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Queue Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Applies to messages sent with ->queue().
+    | - connection / name: queue connection and queue name (null = app default)
+    | - tries, backoff, timeout: job retry attempts, seconds between retries
+    |   (single number or comma list like "10,30,60"), max job run time
+    | - delay: seconds before a queued message is processed
+    | - cooldown: extra seconds between each message of one bulk queue() call
+    | - retry_failed_sends: retry the job when the provider reports a failure
+    |
+    */
+
+    'queue' => [
+        'connection' => env('TEXTIFY_QUEUE_CONNECTION'),
+        'name' => env('TEXTIFY_QUEUE_NAME'),
+        'tries' => (int) env('TEXTIFY_QUEUE_TRIES', 3),
+        'backoff' => env('TEXTIFY_QUEUE_BACKOFF', '10,30,60'),
+        'timeout' => (int) env('TEXTIFY_QUEUE_TIMEOUT', 60),
+        'delay' => (int) env('TEXTIFY_QUEUE_DELAY', 0),
+        'cooldown' => (int) env('TEXTIFY_QUEUE_COOLDOWN', 0),
+        'retry_failed_sends' => (bool) env('TEXTIFY_QUEUE_RETRY_FAILED_SENDS', true),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Message Validation
     |--------------------------------------------------------------------------
     |

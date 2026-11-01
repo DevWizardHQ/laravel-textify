@@ -278,13 +278,7 @@ class TextifyManager implements TextifyManagerInterface
                 $this->preparedFrom
             );
 
-            $job = new SendTextifyJob($textifyMessage, $this->defaultProvider ?: 'default');
-
-            if ($queueName) {
-                return dispatch($job)->onQueue($queueName);
-            }
-
-            return dispatch($job);
+            return $this->dispatchQueuedMessage($textifyMessage, $queueName, 0);
         }
 
         // Handle array of contacts - create multiple jobs
@@ -300,10 +294,7 @@ class TextifyManager implements TextifyManagerInterface
                     $messageData['metadata'] ?? []
                 );
 
-                $job = new SendTextifyJob($textifyMessage, $this->defaultProvider ?: 'default');
-
-                $dispatchedJob = $queueName ? dispatch($job)->onQueue($queueName) : dispatch($job);
-                $jobs[] = $dispatchedJob;
+                $jobs[] = $this->dispatchQueuedMessage($textifyMessage, $queueName, count($jobs));
             }
         } else {
             // Case 2: Simple array of phone numbers with same message
@@ -314,14 +305,28 @@ class TextifyManager implements TextifyManagerInterface
                     $this->preparedFrom
                 );
 
-                $job = new SendTextifyJob($textifyMessage, $this->defaultProvider ?: 'default');
-
-                $dispatchedJob = $queueName ? dispatch($job)->onQueue($queueName) : dispatch($job);
-                $jobs[] = $dispatchedJob;
+                $jobs[] = $this->dispatchQueuedMessage($textifyMessage, $queueName, count($jobs));
             }
         }
 
         return $jobs;
+    }
+
+    protected function dispatchQueuedMessage(TextifyMessage $message, ?string $queueName, int $position): mixed
+    {
+        $job = new SendTextifyJob($message, $this->defaultProvider ?: 'default');
+
+        if ($queueName) {
+            $job->onQueue($queueName);
+        }
+
+        $cooldown = (int) ($this->config['queue']['cooldown'] ?? 0);
+
+        if ($cooldown > 0 && $position > 0) {
+            $job->delay((int) ($job->delay ?? 0) + $position * $cooldown);
+        }
+
+        return dispatch($job);
     }
 
     /**
