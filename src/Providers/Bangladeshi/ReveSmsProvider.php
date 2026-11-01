@@ -16,6 +16,8 @@ class ReveSmsProvider extends BaseProvider
 
     protected array $supportedCountries = ['BD'];
 
+    protected string $defaultCallerId = 'REVESMS';
+
     protected function getClientConfig(): array
     {
         return [
@@ -40,7 +42,7 @@ class ReveSmsProvider extends BaseProvider
         $params = [
             'apikey' => $this->config['apikey'],
             'secretkey' => $this->config['secretkey'],
-            'callerID' => $message->getFrom() ?? $this->config['sender_id'] ?? 'REVESMS',
+            'callerID' => $message->getFrom() ?? $this->config['sender_id'] ?? $this->defaultCallerId,
             'toUser' => $this->formatPhoneNumber($message->getTo()),
             'messageContent' => $message->getMessage(),
         ];
@@ -57,7 +59,7 @@ class ReveSmsProvider extends BaseProvider
         // REVE SMS returns Status "0" for success
         if (isset($response['Status']) && $response['Status'] === '0') {
             return TextifyResponse::success(
-                messageId: $response['Message_ID'] ?? uniqid('revesms_'),
+                messageId: $response['Message_ID'] ?? uniqid($this->name.'_'),
                 status: 'sent',
                 cost: null, // REVE SMS doesn't return cost in response
                 rawResponse: [
@@ -75,10 +77,12 @@ class ReveSmsProvider extends BaseProvider
             '101' => 'Internal server error',
             '1' => 'Request failed',
             '-42' => 'Authorization failed',
+            '-1' => 'Org client not found (invalid apikey/secretkey)',
+            '-59' => 'IP not allowed (ask the provider to whitelist your server IP)',
         ];
 
         $errorCode = $response['Status'] ?? 'unknown';
-        $errorMessage = $errorMessages[$errorCode] ?? $response['Text'] ?? 'Unknown error occurred';
+        $errorMessage = $errorMessages[$errorCode] ?? $response['StatusDescription'] ?? $response['Text'] ?? 'Unknown error occurred';
 
         return TextifyResponse::failed(
             errorCode: $errorCode,
