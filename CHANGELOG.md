@@ -5,6 +5,30 @@ All notable changes to `laravel-textify` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.8.0 - 2026-11-01
+
+### Added
+
+- **SAS Bulk SMS provider** (`sasbulksms` driver). SAS runs on the REVE SMS HTTP API at `http://sms.sasbulksms.com:3040`; it needs `SASBULKSMS_APIKEY` and `SASBULKSMS_SECRETKEY`, sends numbers as `8801XXXXXXXXX`, and uses sender ID `0` (the account's default) unless `SASBULKSMS_SENDER_ID` is set. The sending server's IP must be whitelisted by SAS. There is no balance API, so `getBalance()` throws. (#34)
+- **Queue settings** in the new `queue` config section, all with defaults: `TEXTIFY_QUEUE_CONNECTION`, `TEXTIFY_QUEUE_NAME`, `TEXTIFY_QUEUE_TRIES` (3), `TEXTIFY_QUEUE_BACKOFF` (`10,30,60`), `TEXTIFY_QUEUE_TIMEOUT` (60), `TEXTIFY_QUEUE_DELAY` (0) and `TEXTIFY_QUEUE_COOLDOWN` (0, seconds between each SMS of one bulk `queue()` call). (#35)
+- **Failure kinds with their own retry switches.** Network failures now return `CONNECTION_FAILED` (never reached the gateway), `SERVER_ERROR` (5xx except 504) or `TIMEOUT` (request sent, no answer; the SMS may already be out), available as `TextifyResponse::ERROR_*` constants. Queued jobs retry connection and server errors by default, and never retry timeouts or gateway rejections unless `TEXTIFY_QUEUE_RETRY_TIMEOUTS` / `TEXTIFY_QUEUE_RETRY_PROVIDER_ERRORS` are turned on. (#35)
+- `TEXTIFY_FALLBACK_ON_TIMEOUT` (default `false`). (#35)
+- REVE error codes `-1` (invalid apikey/secretkey) and `-59` (IP not allowed); other unknown codes now show the gateway's `StatusDescription`. (#34)
+
+### Changed
+
+- Network exceptions used to return error code `PROVIDER_ERROR`. They now return `CONNECTION_FAILED`, `SERVER_ERROR` or `TIMEOUT`. Update any code that checks for `PROVIDER_ERROR` on network errors. (#35)
+- The fallback provider is no longer used after a timeout, since the first gateway may already have sent the SMS. Set `TEXTIFY_FALLBACK_ON_TIMEOUT=true` for the old behaviour. (#35)
+- A queued SMS whose send failed used to finish as a successful job. It now retries or fails the job, depending on the failure kind; failed jobs show in `failed_jobs` and fire `TextifyJobFailed`. For the old behaviour set `TEXTIFY_QUEUE_TRIES=1`. (#35)
+- `TEXTIFY_QUEUE_CONNECTION` and `TEXTIFY_QUEUE_NAME` were documented but never read; they work now. (#35)
+
+### Maintenance
+
+- Dependency floors raised to current releases (Guzzle `^7.8.2`, Larastan `^3.13`, Pint `^1.32`, Collision `^8.9`); unused PHPStan 1.x options dropped. (#36)
+- CI tests on PHP 8.5 and runs PHPStan on 8.5. (#36)
+
+**Full Changelog**: https://github.com/DevWizardHQ/laravel-textify/compare/v1.7.0...v1.8.0
+
 ## v1.7.0 - 2026-10-30
 
 ### Breaking
@@ -196,6 +220,7 @@ DHOROLA_CONNECT_TIMEOUT=15
 # Or for any other provider
 BULKSMSBD_CONNECT_TIMEOUT=8
 MIMSMS_CONNECT_TIMEOUT=12
+
 
 
 
