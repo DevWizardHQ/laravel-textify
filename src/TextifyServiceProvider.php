@@ -16,6 +16,7 @@ use DevWizard\Textify\Providers\Bangladeshi\DhorolaSmsProvider;
 use DevWizard\Textify\Providers\Bangladeshi\EsmsProvider;
 use DevWizard\Textify\Providers\Bangladeshi\MimSmsProvider;
 use DevWizard\Textify\Providers\Bangladeshi\ReveSmsProvider;
+use DevWizard\Textify\Providers\Bangladeshi\SasBulkSmsProvider;
 use DevWizard\Textify\Providers\Global\NexmoPlaceholderProvider;
 use DevWizard\Textify\Providers\Global\NexmoProvider;
 use DevWizard\Textify\Providers\Global\TwilioPlaceholderProvider;
@@ -105,6 +106,7 @@ class TextifyServiceProvider extends PackageServiceProvider
             'mimsms' => $config['class'] ?? new MimSmsProvider($config),
             'esms' => $config['class'] ?? new EsmsProvider($config),
             'revesms' => $config['class'] ?? new ReveSmsProvider($config),
+            'sasbulksms' => $config['class'] ?? new SasBulkSmsProvider($config),
             'alphasms' => $config['class'] ?? new AlphaSmsProvider($config),
             'twilio' => $this->createTwilioProvider($config),
             'nexmo' => $this->createNexmoProvider($config),

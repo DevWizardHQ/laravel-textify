@@ -13,7 +13,7 @@ A powerful and enterprise-ready SMS package for Laravel applications supporting 
 ## ✨ Features
 
 -   🚀 **Multiple SMS Providers**: Support for 8+ SMS gateways with unified API
--   🇧🇩 **Bangladeshi SMS Providers**: DhorolaSMS, BulkSMSBD, MimSMS, eSMS, REVE SMS, Alpha SMS
+-   🇧🇩 **Bangladeshi SMS Providers**: DhorolaSMS, BulkSMSBD, MimSMS, eSMS, REVE SMS, SAS Bulk SMS, Alpha SMS
 -   🌍 **International SMS Providers**: Twilio, Nexmo (Vonage) with optional SDK installation
 -   🔄 **Automatic Fallback System**: Seamless failover between providers for maximum reliability
 -   📊 **Comprehensive Activity Tracking**: Database and file-based logging with audit trails
@@ -50,6 +50,7 @@ A powerful and enterprise-ready SMS package for Laravel applications supporting 
 | **MimSMS**     | Transactional/Promotional, Campaign support      | ✅ Ready | `send()`, `getBalance()` |
 | **eSMS**       | Enterprise API, Bearer token auth, Cost tracking | ✅ Ready | `send()`                 |
 | **REVE SMS**   | Premium gateway, Balance check, Multi-endpoint   | ✅ Ready | `send()`, `getBalance()` |
+| **SAS Bulk SMS** | REVE-based gateway, Delivery status | ✅ Ready | `send()`, `getDeliveryStatus()` |
 | **Alpha SMS**  | Dual format support, Balance check, SSL/Non-SSL  | ✅ Ready | `send()`, `getBalance()` |
 
 ### 🌍 International Providers
@@ -170,6 +171,15 @@ REVESMS_BALANCE_URI=https://smpp.revesms.com
 REVESMS_TIMEOUT=30
 REVESMS_CONNECT_TIMEOUT=10
 REVESMS_VERIFY_SSL=true
+
+# SAS Bulk SMS Configuration (HTTP port 3040, HTTPS port 3050)
+SASBULKSMS_APIKEY=your_api_key
+SASBULKSMS_SECRETKEY=your_secret_key
+SASBULKSMS_SENDER_ID=0
+SASBULKSMS_BASE_URI=http://sms.sasbulksms.com:3040
+SASBULKSMS_TIMEOUT=30
+SASBULKSMS_CONNECT_TIMEOUT=10
+SASBULKSMS_VERIFY_SSL=false
 
 # Alpha SMS Configuration
 ALPHASMS_API_KEY=your_api_key
@@ -557,6 +567,19 @@ $balance = Textify::via('revesms')->getBalance();
 echo "Balance: $balance";
 ```
 
+#### SAS Bulk SMS
+
+Uses the REVE SMS HTTP API. Numbers are sent as `8801XXXXXXXXX`. Sender ID `0` uses the account's default sender ID. No balance API is available.
+
+```php
+Textify::via('sasbulksms')
+    ->to('01712345678')
+    ->message('Hello from SAS Bulk SMS')
+    ->send();
+
+$status = Textify::getProvider('sasbulksms')->getDeliveryStatus($messageId);
+```
+
 #### Alpha SMS
 
 ```php
@@ -896,6 +919,7 @@ Textify::to('01712345678')->message('Test')->reset(); // Clears prepared data
 -   `mimsms` - MimSMS
 -   `esms` - eSMS
 -   `revesms` - REVE SMS
+-   `sasbulksms` - SAS Bulk SMS
 -   `alphasms` - Alpha SMS
 -   `twilio` - Twilio (requires SDK)
 -   `nexmo` - Nexmo/Vonage (requires SDK)

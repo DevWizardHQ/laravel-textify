@@ -13,7 +13,7 @@ return [
     | "providers" array below.
     |
     | Supported: "log", "array", "dhorola", "bulksmsbd", "mimsms", "esms",
-    | "revesms", "alphasms", "twilio", "nexmo",
+    | "revesms", "sasbulksms", "alphasms", "twilio", "nexmo",
     |
     */
 
@@ -125,6 +125,17 @@ return [
             'timeout' => env('REVESMS_TIMEOUT', 30),
             'connect_timeout' => env('REVESMS_CONNECT_TIMEOUT', 10),
             'verify_ssl' => env('REVESMS_VERIFY_SSL', false),
+        ],
+
+        'sasbulksms' => [
+            'driver' => 'sasbulksms',
+            'apikey' => env('SASBULKSMS_APIKEY'),
+            'secretkey' => env('SASBULKSMS_SECRETKEY'),
+            'sender_id' => env('SASBULKSMS_SENDER_ID', '0'),
+            'base_uri' => env('SASBULKSMS_BASE_URI', 'http://sms.sasbulksms.com:3040'),
+            'timeout' => env('SASBULKSMS_TIMEOUT', 30),
+            'connect_timeout' => env('SASBULKSMS_CONNECT_TIMEOUT', 10),
+            'verify_ssl' => env('SASBULKSMS_VERIFY_SSL', false),
         ],
 
         'alphasms' => [
